@@ -16,6 +16,39 @@ BOT_TOKEN=<токен от @BotFather> .venv/bin/python -m squirtcar.bot
 Состояние диалогов складывается в `squirtcar_state.pickle` рядом с местом запуска
 (путь меняется переменной `STATE_FILE`).
 
+## Тесты
+
+```bash
+.venv/bin/pip install -r requirements-dev.txt
+.venv/bin/python -m pytest
+.venv/bin/ruff check ..
+```
+
+Тесты покрывают математику (`calc`), разбор полей (`model`), тексты отчёта (`report`),
+видимость полей по переключателям (`sections`), HTML-экспорт (`share`) и рендер графиков
+(`charts`). Формулы проверяются независимым способом — например, аннуитет сверяется
+дисконтированием потока платежей обратно к сумме кредита, а не повтором той же формулы.
+
+Отдельно есть сверка с оригиналом: `tools/verify_against_html.py` гоняет скрипт из
+`SquirtCar_0.1.2.html` в JavaScriptCore поверх DOM-стаба и сравнивает числа с Python-портом
+на семи наборах входных данных. Скрипт работает только на macOS (нужен `jsc`), поэтому в CI
+не участвует — запускать руками после правок в `calc`/`report`.
+
+## Деплой на Railway
+
+Конфиг сервиса лежит в `railway.json`, версия Python — в `.python-version`.
+
+1. Railway → **New Project** → **Deploy from GitHub repo** → `key-peskov/squirt-car`.
+2. В настройках сервиса **Root Directory** → `bot` (код бота живёт в подпапке).
+3. **Variables** → `BOT_TOKEN` = токен от @BotFather.
+4. **Volume** на `/data`, затем `STATE_FILE` = `/data/squirtcar_state.pickle` — иначе
+   состояние диалогов будет теряться при каждом редеплое: файловая система контейнера
+   эфемерная.
+5. Replicas оставить **1**: бот работает на long polling, вторая копия получит от Telegram
+   конфликт `getUpdates`.
+
+HTTP-порт сервису не нужен — это worker, а не веб-приложение.
+
 ## Как устроен диалог
 
 Все поля уже заполнены теми же значениями по умолчанию, что и в HTML, поэтому

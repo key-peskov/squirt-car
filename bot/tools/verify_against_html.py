@@ -8,6 +8,7 @@ squirtcar.calc на тех же входных данных.
 """
 
 import json
+import math
 import re
 import subprocess
 import sys
@@ -139,6 +140,11 @@ def py_state(case: dict) -> State:
     return s
 
 
+def jr(v: float) -> int:
+    """Math.round из JS: половина всегда вверх, в отличие от round() в Python."""
+    return math.floor(v + 0.5)
+
+
 def py_values(s: State) -> dict[str, float]:
     """Те же метрики, что HTML пишет в DOM."""
     if s.mode == "have":
@@ -159,35 +165,35 @@ def py_values(s: State) -> dict[str, float]:
         )
         sav = calc.have_savings(s)
         return {
-            "resultCurrentMonthly": round(curr),
-            "resultNewMonthly": round(new_total),
-            "resultDiff": abs(round(new_total - curr)),
+            "resultCurrentMonthly": jr(curr),
+            "resultNewMonthly": jr(new_total),
+            "resultDiff": abs(jr(new_total - curr)),
             "resultHappinessPerMoney": round(h.at_now / curr * 1000, 1) if curr > 0 else 0.0,
             "resultTimeSaved": round(ts.hours_per_month, 1) if ts.hours_per_month > 0 else None,
-            "cmpCurrentOperating": round(operating / 12),
-            "cmpCurrentDep": round(dep / 12),
-            "cmpCurrentCredit": round(credit_annual / 12),
-            "cmpCurrentTotal": round(curr),
-            "cmpNewOperating": round(new_op / 12),
-            "cmpNewDep": round(new_dep / 12),
-            "cmpNewCredit": round(new_credit),
-            "cmpNewTotal": round(new_total),
-            "cmpFood": round(s.num("expFood")),
-            "cmpHousing": round(s.num("expHousing")),
-            "cmpComms": round(s.num("expComms") + s.num("expOther")),
-            "cmpLifeTotal": round(personal),
+            "cmpCurrentOperating": jr(operating / 12),
+            "cmpCurrentDep": jr(dep / 12),
+            "cmpCurrentCredit": jr(credit_annual / 12),
+            "cmpCurrentTotal": jr(curr),
+            "cmpNewOperating": jr(new_op / 12),
+            "cmpNewDep": jr(new_dep / 12),
+            "cmpNewCredit": jr(new_credit),
+            "cmpNewTotal": jr(new_total),
+            "cmpFood": jr(s.num("expFood")),
+            "cmpHousing": jr(s.num("expHousing")),
+            "cmpComms": jr(s.num("expComms") + s.num("expOther")),
+            "cmpLifeTotal": jr(personal),
             "cmpCurrentShare": round(curr / income * 100, 1) if income > 0 else None,
             "cmpNewShare": round(new_total / income * 100, 1) if income > 0 else None,
             "cmpLifeShare": round(personal / income * 100, 1) if income > 0 else None,
-            "loanAmount": round(loan.principal),
-            "loanMonthly": round(loan.monthly),
-            "loanOverpay": round(loan.overpay),
-            "loanRealPrice": round(loan.price + loan.overpay),
-            "creditYearlyDisplay": round(calc.have_credit_yearly(s)),
-            "creditOverpayDisplay": round(calc.have_credit_overpay(s)),
-            "savKeepVal": round(sav.keep_end),
-            "savNewVal": round(sav.new_end),
-            "savNoCarVal": round(sav.no_car_end),
+            "loanAmount": jr(loan.principal),
+            "loanMonthly": jr(loan.monthly),
+            "loanOverpay": jr(loan.overpay),
+            "loanRealPrice": jr(loan.price + loan.overpay),
+            "creditYearlyDisplay": jr(calc.have_credit_yearly(s)),
+            "creditOverpayDisplay": jr(calc.have_credit_overpay(s)),
+            "savKeepVal": jr(sav.keep_end),
+            "savNewVal": jr(sav.new_end),
+            "savNoCarVal": jr(sav.no_car_end),
         }
 
     operating = calc.nc_operating(s)
@@ -202,19 +208,19 @@ def py_values(s: State) -> dict[str, float]:
     )
     sav = calc.none_savings(s)
     return {
-        "ncResultMonthly": round(car_monthly),
+        "ncResultMonthly": jr(car_monthly),
         "ncResultShare": round(car_monthly / income * 100, 1) if income > 0 else None,
         "ncResultTimeSaved": round(ts.hours_per_month, 1) if ts.hours_per_month > 0 else None,
-        "ncCmpOperating": round(operating / 12),
-        "ncCmpDep": round(dep / 12),
-        "ncCmpCredit": round(credit),
-        "ncCmpTotal": round(car_monthly),
-        "ncCmpFood": round(s.num("ncExpFood")),
-        "ncCmpHousing": round(s.num("ncExpHousing")),
-        "ncCmpComms": round(s.num("ncExpComms") + s.num("ncExpOther")),
-        "ncCmpLifeTotal": round(personal),
-        "savNewVal": round(sav.car_end),
-        "savNoCarVal": round(sav.no_car_end),
+        "ncCmpOperating": jr(operating / 12),
+        "ncCmpDep": jr(dep / 12),
+        "ncCmpCredit": jr(credit),
+        "ncCmpTotal": jr(car_monthly),
+        "ncCmpFood": jr(s.num("ncExpFood")),
+        "ncCmpHousing": jr(s.num("ncExpHousing")),
+        "ncCmpComms": jr(s.num("ncExpComms") + s.num("ncExpOther")),
+        "ncCmpLifeTotal": jr(personal),
+        "savNewVal": jr(sav.car_end),
+        "savNoCarVal": jr(sav.no_car_end),
     }
 
 
@@ -283,7 +289,11 @@ CASES = [
 ]
 
 
-def close(a, b, tol=1.0) -> bool:
+# Величины из toFixed(1) сверяем с допуском на последний знак, остальное — точно.
+LOOSE = ("Share", "HappinessPerMoney", "TimeSaved")
+
+
+def close(a, b, tol=0.001) -> bool:
     if a is None or b is None:
         return a is None and b is None
     return abs(a - b) <= max(tol, abs(b) * 1e-6)
@@ -299,7 +309,8 @@ def main() -> int:
 
         for key, expected in py.items():
             got = as_number(js["text"].get(key, ""))
-            if not close(got, expected):
+            tol = 0.06 if any(key.endswith(x) or x in key for x in LOOSE) else 0.001
+            if not close(got, expected, tol):
                 problems.append(f"  {key}: JS={js['text'].get(key)!r} PY={expected!r}")
 
         pc = py_curves(s)
@@ -325,7 +336,7 @@ def main() -> int:
                 if not close(jp["value"], pp, tol=1e-6):
                     problems.append(f"  hap[{i}]: JS={jp['value']} PY={pp}")
 
-        if not close(as_number(str(js["residual"])), round(calc.have_residual(s)), tol=1.0):
+        if not close(as_number(str(js["residual"])), jr(calc.have_residual(s)), tol=1.0):
             problems.append(f"  residual: JS={js['residual']} PY={calc.have_residual(s)}")
 
         # Инсайты сравниваем как текст без разметки.

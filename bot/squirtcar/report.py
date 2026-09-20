@@ -4,6 +4,7 @@
 renderHaveSavings, renderNoneSavings) перенесены дословно.
 """
 
+import math
 from html import escape
 
 from . import calc
@@ -13,13 +14,19 @@ NBSP = " "
 
 
 def fmt(v: float) -> str:
-    """Аналог fmt(): округление + русский разделитель разрядов."""
+    """Аналог fmt(): округление + русский разделитель разрядов.
+
+    JS-оригинал округляет через Math.round — половина всегда вверх (0.5 → 1),
+    тогда как round() в Python округляет к чётному (0.5 → 0). Считаем floor(v+0.5),
+    чтобы совпадать с вебом до рубля. Нечисловое значение, как и !isFinite в JS, — «0».
+    """
     try:
-        if v != v or v in (float("inf"), float("-inf")):
-            return "0"
-    except TypeError:
+        v = float(v)
+    except (TypeError, ValueError):
         return "0"
-    return f"{round(v):,}".replace(",", NBSP)
+    if v != v or v in (float("inf"), float("-inf")):
+        return "0"
+    return f"{math.floor(v + 0.5):,}".replace(",", NBSP)
 
 
 def _pct(part: float, whole: float) -> str:
@@ -181,7 +188,8 @@ def have_report(s: State) -> str:
             f"переплата {fmt(calc.have_credit_overpay(s))} ₽",
         ]
     if s.toggles["depreciationMode"] == "auto":
-        lines += ["", f"📉 Потери от амортизации: <b>{fmt(calc.have_auto_depreciation(s))} ₽/год</b>"]
+        auto_dep = fmt(calc.have_auto_depreciation(s))
+        lines += ["", f"📉 Потери от амортизации: <b>{auto_dep} ₽/год</b>"]
 
     sav = calc.have_savings(s)
     lines += [

@@ -1,0 +1,12 @@
+line-length = 100
+exclude = [".venv"]
+
+[lint]
+select = ["E", "F", "I", "UP", "W"]
+
+[lint.per-file-ignores]
+# Разметка, палитры и тексты перенесены из HTML один в один — длина строк оттуда же.
+"bot/squirtcar/share.py" = ["E501"]
+"bot/squirtcar/charts.py" = ["E501"]
+"bot/squirtcar/model.py" = ["E501"]
+"bot/tools/verify_against_html.py" = ["E501"]
