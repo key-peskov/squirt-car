@@ -29,15 +29,19 @@ BOT_TOKEN=<токен от @BotFather> .venv/bin/python -m squirtcar.bot
 ### Railway
 
 1. New Project → Deploy from GitHub repo → `key-peskov/squirt-car`.
-2. В настройках сервиса **Root Directory** = `bot` — иначе Railway не найдёт
-   `Dockerfile` и `railway.json` и попробует собрать репозиторий как статику.
-3. Variables → `BOT_TOKEN` = токен от @BotFather.
+2. Сервис → **Settings** → **Root Directory** = `/bot`. Без этого Railway анализирует
+   корень репозитория, не находит `Dockerfile` и падает на этапе prepare:
+   «Railpack could not determine how to build the app».
+3. Variables → `BOT_TOKEN` = токен от @BotFather. Railway подставит подсказку из
+   `.env.example` — там заглушка, значение надо перебить своим.
 4. Volume → Mount path `/data` (переменная `STATE_FILE` уже указывает туда).
-5. Deploy. В логах должно появиться `SquirtCar bot запущен`.
+5. Применить staged changes кнопкой **Deploy**. В логах должно появиться
+   `SquirtCar bot запущен`.
 
-`railway.json` фиксирует сборку из Dockerfile (`builder: DOCKERFILE`), один инстанс
-и рестарт при падении. Отдельная версия Python не нужна — она зафиксирована базовым
-образом `python:3.12-slim`.
+`railway.json` лежит **в корне репозитория**, а не рядом с ботом: конфиг-файл не следует
+за Root Directory, Railway ищет его только в корне. Он фиксирует сборку из Dockerfile,
+один инстанс и рестарт при падении. Путь к самому `Dockerfile` не указан намеренно —
+Railway ищет его внутри Root Directory, то есть в `bot/`.
 
 ### Render
 
