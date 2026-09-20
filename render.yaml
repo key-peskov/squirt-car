@@ -1,0 +1,23 @@
+# Blueprint для Render. Тип worker — у бота нет HTTP-порта, он сам опрашивает
+# Telegram. Бесплатного плана у worker'ов нет, минимальный — starter.
+services:
+  - type: worker
+    name: squirtcar-bot
+    runtime: docker
+    repo: https://github.com/key-peskov/squirt-car
+    branch: main
+    dockerfilePath: ./bot/Dockerfile
+    dockerContext: ./bot
+    plan: starter
+    region: frankfurt
+    numInstances: 1
+    autoDeployTrigger: commit
+    disk:
+      name: state
+      mountPath: /data
+      sizeGB: 1
+    envVars:
+      - key: BOT_TOKEN
+        sync: false
+      - key: STATE_FILE
+        value: /data/squirtcar_state.pickle

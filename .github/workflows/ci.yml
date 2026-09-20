@@ -35,3 +35,18 @@ jobs:
       - name: Тесты
         run: pytest
         working-directory: bot
+
+  docker:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Сборка образа
+        run: docker build -t squirtcar-bot bot
+
+      - name: Образ запускается и просит токен
+        run: |
+          out=$(docker run --rm squirtcar-bot 2>&1) || true
+          echo "$out"
+          echo "$out" | grep -q "Не задан BOT_TOKEN"

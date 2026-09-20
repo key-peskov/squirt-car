@@ -1,0 +1,12 @@
+.venv/
+__pycache__/
+*.pyc
+*.pickle
+.env
+.git/
+tests/
+tools/
+conftest.py
+pytest.ini
+requirements-dev.txt
+README.md

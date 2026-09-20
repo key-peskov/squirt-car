@@ -16,6 +16,38 @@ BOT_TOKEN=<токен от @BotFather> .venv/bin/python -m squirtcar.bot
 Состояние диалогов складывается в `squirtcar_state.pickle` рядом с местом запуска
 (путь меняется переменной `STATE_FILE`).
 
+## Хостинг
+
+Бот работает на long polling: HTTP-порт ему не нужен, нужен постоянно живой процесс
+и диск под `squirtcar_state.pickle`. В `Dockerfile` состояние по умолчанию пишется
+в `/data`, куда обе платформы монтируют диск.
+
+Важно: токен нельзя опрашивать из двух мест одновременно — Telegram начнёт отдавать
+`Conflict` и терять апдейты. Поэтому в конфигах жёстко один инстанс, и на время
+деплоя локальную копию надо останавливать.
+
+### Railway
+
+1. New Project → Deploy from GitHub repo → `key-peskov/squirt-car`.
+2. В настройках сервиса **Root Directory** = `bot` — иначе Railway не найдёт
+   `Dockerfile` и `railway.json` и попробует собрать репозиторий как статику.
+3. Variables → `BOT_TOKEN` = токен от @BotFather.
+4. Volume → Mount path `/data` (переменная `STATE_FILE` уже указывает туда).
+5. Deploy. В логах должно появиться `SquirtCar bot запущен`.
+
+`railway.json` фиксирует сборку из Dockerfile (`builder: DOCKERFILE`), один инстанс
+и рестарт при падении. Отдельная версия Python не нужна — она зафиксирована базовым
+образом `python:3.12-slim`.
+
+### Render
+
+В репозитории лежит `render.yaml` (blueprint, в корне — Render читает его только
+оттуда). New → Blueprint → выбрать репозиторий → Render поднимет worker с диском
+на `/data` и спросит `BOT_TOKEN`.
+
+Оговорка: worker на Render платный (минимум starter). Бесплатный план бывает только
+у web-сервисов, а они засыпают без входящих запросов — для polling-бота не годится.
+
 ## Тесты
 
 ```bash
@@ -29,25 +61,8 @@ BOT_TOKEN=<токен от @BotFather> .venv/bin/python -m squirtcar.bot
 (`charts`). Формулы проверяются независимым способом — например, аннуитет сверяется
 дисконтированием потока платежей обратно к сумме кредита, а не повтором той же формулы.
 
-Отдельно есть сверка с оригиналом: `tools/verify_against_html.py` гоняет скрипт из
-`SquirtCar_0.1.2.html` в JavaScriptCore поверх DOM-стаба и сравнивает числа с Python-портом
-на семи наборах входных данных. Скрипт работает только на macOS (нужен `jsc`), поэтому в CI
-не участвует — запускать руками после правок в `calc`/`report`.
-
-## Деплой на Railway
-
-Конфиг сервиса лежит в `railway.json`, версия Python — в `.python-version`.
-
-1. Railway → **New Project** → **Deploy from GitHub repo** → `key-peskov/squirt-car`.
-2. В настройках сервиса **Root Directory** → `bot` (код бота живёт в подпапке).
-3. **Variables** → `BOT_TOKEN` = токен от @BotFather.
-4. **Volume** на `/data`, затем `STATE_FILE` = `/data/squirtcar_state.pickle` — иначе
-   состояние диалогов будет теряться при каждом редеплое: файловая система контейнера
-   эфемерная.
-5. Replicas оставить **1**: бот работает на long polling, вторая копия получит от Telegram
-   конфликт `getUpdates`.
-
-HTTP-порт сервису не нужен — это worker, а не веб-приложение.
+Отдельно есть сверка с оригиналом — `tools/verify_against_html.py`, см. «Сверка с
+оригиналом» ниже. В CI она не участвует: ей нужен `jsc`, который есть только в macOS.
 
 ## Как устроен диалог
 
