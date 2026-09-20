@@ -23,7 +23,9 @@ RUN mkdir -p "$MPLCONFIGDIR" \
 # Сюда Railway/Render монтируют диск, на котором переживает рестарты pickle
 # с состоянием диалогов. Контейнер остаётся root'ом: том монтируется
 # root-owned, и непривилегированный пользователь в него не запишет.
+# Инструкции VOLUME здесь быть не должно: Railway отклоняет такой Dockerfile
+# («docker VOLUME is not supported, use Railway Volumes»), а точку монтирования
+# обе платформы задают своими настройками, а не образом.
 RUN mkdir -p /data
-VOLUME ["/data"]
 
 CMD ["python", "-m", "squirtcar.bot"]
