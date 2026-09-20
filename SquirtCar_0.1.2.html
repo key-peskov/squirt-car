@@ -1,0 +1,2054 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SquirtCar — дружелюбный калькулятор владения авто</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f6f8; --surface: #ffffff; --surface-2: #f0f2f5; --border: #d9dde3;
+    --text: #1a1d23; --text-dim: #5c6470; --text-mute: #8a929e;
+    --accent: #2b5fd9; --accent-soft: #e8eefb;
+    --positive: #14804a; --positive-soft: #e6f4ec;
+    --negative: #b91c1c; --negative-soft: #fdeaea;
+    --warning: #b45309; --warning-soft: #fdf3e3;
+    --savings: #14804a; --savings-new: #b45309; --savings-nocar: #8a929e;
+    --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-lg: 0 4px 12px rgba(0,0,0,0.08);
+    --brand-font: 'Bungee', system-ui, sans-serif;
+  }
+  html[data-theme="dark"] {
+    --bg: #14161a; --surface: #1c1f24; --surface-2: #24282e; --border: #333941;
+    --text: #e8eaed; --text-dim: #a8b0bb; --text-mute: #707885;
+    --accent: #5b8bf0; --accent-soft: #1e2a44;
+    --positive: #4ade80; --positive-soft: #14301f;
+    --negative: #f87171; --negative-soft: #3a1a1a;
+    --warning: #fbbf24; --warning-soft: #3a2e10;
+    --savings: #4ade80; --savings-new: #fbbf24; --savings-nocar: #707885;
+    --shadow: 0 1px 3px rgba(0,0,0,0.4);
+    --shadow-lg: 0 4px 12px rgba(0,0,0,0.5);
+  }
+  html[data-theme="cyber"] {
+    --bg: #0a0612; --surface: #120a22; --surface-2: #1a0f30; --border: #3d1a5c;
+    --text: #e8f5ff; --text-dim: #9b7fc4; --text-mute: #6a5590;
+    --accent: #ff2a9d; --accent-soft: #2a0a3d;
+    --positive: #00ff9d; --positive-soft: #052e1f;
+    --negative: #ff3b6b; --negative-soft: #3d0a1a;
+    --warning: #00e5ff; --warning-soft: #0a2838;
+    --savings: #00ff9d; --savings-new: #00e5ff; --savings-nocar: #9b7fc4;
+    --shadow: 0 0 12px rgba(255,42,157,0.25), 0 1px 3px rgba(0,0,0,0.5);
+    --shadow-lg: 0 0 30px rgba(255,42,157,0.35), 0 0 60px rgba(0,229,255,0.15);
+    --brand-font: 'Orbitron', sans-serif;
+  }
+  html[data-theme="cyber"] body {
+    background-image:
+      radial-gradient(circle at 15% 10%, rgba(255,42,157,0.15) 0%, transparent 45%),
+      radial-gradient(circle at 85% 85%, rgba(0,229,255,0.12) 0%, transparent 45%),
+      linear-gradient(rgba(255,42,157,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,42,157,0.05) 1px, transparent 1px);
+    background-size: auto, auto, 40px 40px, 40px 40px;
+  }
+  html[data-theme="cyber"] body::before {
+    content: ''; position: fixed; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, transparent 0%, #00e5ff 20%, #ff2a9d 50%, #b02fff 80%, transparent 100%);
+    box-shadow: 0 0 20px #ff2a9d, 0 0 40px #00e5ff;
+    z-index: 1000; pointer-events: none;
+  }
+  html[data-theme="cyber"] .brand-name {
+    font-weight: 900; color: #00e5ff; letter-spacing: 0.04em;
+    text-shadow: 0 0 10px #00e5ff, 0 0 20px rgba(0,229,255,0.6), 2px 2px 0 rgba(255,42,157,0.5);
+  }
+  html[data-theme="cyber"] .mascot {
+    border-color: #ff2a9d;
+    box-shadow: 0 0 20px rgba(255,42,157,0.7), 0 0 40px rgba(0,229,255,0.3);
+  }
+  html[data-theme="cyber"] .card,
+  html[data-theme="cyber"] .compare,
+  html[data-theme="cyber"] .chart-wrap,
+  html[data-theme="cyber"] .result {
+    box-shadow: 0 0 0 1px rgba(255,42,157,0.1), 0 0 20px rgba(255,42,157,0.08);
+  }
+  html[data-theme="cyber"] .card-title,
+  html[data-theme="cyber"] .compare-title,
+  html[data-theme="cyber"] .chart-title { color: #00e5ff; text-shadow: 0 0 8px rgba(0,229,255,0.6); }
+  html[data-theme="cyber"] .subsection-title { color: #ff2a9d; text-shadow: 0 0 8px rgba(255,42,157,0.5); }
+  html[data-theme="cyber"] .result.accent .val { color: #00e5ff; text-shadow: 0 0 12px rgba(0,229,255,0.7); }
+  html[data-theme="cyber"] .result.positive .val { color: #00ff9d; text-shadow: 0 0 12px rgba(0,255,157,0.7); }
+  html[data-theme="cyber"] .result.negative .val { color: #ff3b6b; text-shadow: 0 0 12px rgba(255,59,107,0.7); }
+  html[data-theme="cyber"] .toggles button.active {
+    background: linear-gradient(135deg, #ff2a9d 0%, #b02fff 100%);
+    border-color: #ff2a9d;
+    box-shadow: 0 0 15px rgba(255,42,157,0.6);
+  }
+  html[data-theme="cyber"] .field input:focus,
+  html[data-theme="cyber"] .field select:focus {
+    border-color: #ff2a9d;
+    box-shadow: 0 0 0 3px rgba(255,42,157,0.2), 0 0 20px rgba(255,42,157,0.4);
+  }
+  html[data-theme="cyber"] .share-btn,
+  html[data-theme="cyber"] .theme-switch button.active {
+    background: linear-gradient(135deg, #ff2a9d 0%, #b02fff 100%);
+    box-shadow: 0 0 15px rgba(255,42,157,0.5);
+  }
+  html[data-theme="cyber"] .happy-thumb {
+    border-color: #00e5ff;
+    box-shadow: 0 0 12px rgba(0,229,255,0.7);
+  }
+  html[data-theme="cyber"] .happy-fill {
+    background: linear-gradient(90deg, #ff3b6b, #ff2a9d, #00e5ff, #00ff9d);
+    box-shadow: 0 0 10px rgba(255,42,157,0.5);
+  }
+  html[data-theme="cyber"] .happy-track { background: rgba(255,42,157,0.2); }
+  html[data-theme="cyber"] .happy-value-badge {
+    background: rgba(0,229,255,0.1); color: #00e5ff;
+    box-shadow: 0 0 10px rgba(0,229,255,0.3);
+  }
+  html[data-theme="cyber"] .disclaimer {
+    background: rgba(0,229,255,0.05);
+    border-color: rgba(0,229,255,0.3);
+    border-left-color: #00e5ff;
+  }
+  html[data-theme="cyber"] .disclaimer-head { color: #00e5ff; }
+  html[data-theme="cyber"] .disclaimer-body strong { color: #00e5ff; }
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: rgba(43,95,217,0.15); }
+  html[data-theme="cyber"] * { -webkit-tap-highlight-color: rgba(255,42,157,0.2); }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-size: 14px; line-height: 1.5;
+    min-height: 100vh; padding: 1.5rem 1rem 3rem;
+    transition: background 0.3s, color 0.3s;
+    -webkit-text-size-adjust: 100%;
+  }
+  .app { max-width: 1180px; margin: 0 auto; }
+  header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+  .brand { display: flex; align-items: center; gap: 0.9rem; min-width: 0; flex: 1; }
+  .mascot {
+    width: 64px; height: 64px; flex-shrink: 0; border-radius: 50%; overflow: hidden;
+    background: var(--surface-2); border: 2px solid var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2rem; box-shadow: var(--shadow);
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+  .mascot img { width: 100%; height: 100%; object-fit: cover; object-position: center 20%; display: block; }
+  .brand-text { min-width: 0; }
+  h1 {
+    font-size: 1.5rem; font-weight: 800; margin: 0; letter-spacing: -0.02em; color: var(--text);
+    display: flex; align-items: baseline; gap: 0.35rem; flex-wrap: wrap; line-height: 1.1;
+  }
+  .brand-name {
+    font-family: var(--brand-font); font-size: 1.65rem; font-weight: 400;
+    letter-spacing: 0.02em; line-height: 1; color: var(--accent);
+    text-shadow: 2px 2px 0 rgba(0,0,0,0.08); padding-right: 0.1rem;
+    transition: color 0.3s, text-shadow 0.3s;
+  }
+  html[data-theme="dark"] .brand-name { text-shadow: 2px 2px 0 rgba(0,0,0,0.5); }
+  h1 .brand-tag { color: var(--text-dim); font-weight: 600; font-size: 0.95rem; }
+  .header-sub { font-size: 0.85rem; color: var(--text-dim); margin-top: 0.15rem; font-weight: 500; }
+  .header-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+  .share-btn {
+    background: var(--accent); color: #fff; border: 1px solid var(--accent);
+    border-radius: 8px; padding: 0.5rem 0.9rem; cursor: pointer;
+    font-family: inherit; font-size: 0.85rem; font-weight: 600;
+    display: flex; align-items: center; gap: 0.4rem;
+    box-shadow: var(--shadow); transition: 0.15s;
+    -webkit-appearance: none; appearance: none; touch-action: manipulation;
+  }
+  .theme-switch {
+    display: flex; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 3px; gap: 2px; box-shadow: var(--shadow);
+  }
+  .theme-switch button {
+    background: transparent; border: none; padding: 0.4rem 0.7rem; border-radius: 6px;
+    cursor: pointer; font-family: inherit; font-size: 0.85rem; font-weight: 600;
+    color: var(--text-dim); display: flex; align-items: center; gap: 0.3rem;
+    transition: 0.15s; -webkit-appearance: none; appearance: none;
+    touch-action: manipulation; white-space: nowrap;
+  }
+  .theme-switch button:hover { color: var(--text); }
+  .theme-switch button.active { background: var(--accent); color: #fff; }
+  .theme-switch button .label { display: inline; }
+  @media (max-width: 720px) {
+    .theme-switch button .label { display: none; }
+    .theme-switch button { padding: 0.4rem 0.5rem; }
+  }
+  .back-link {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    background: transparent; border: none; padding: 0.4rem 0.5rem; margin-bottom: 0.7rem;
+    color: var(--text-dim); font-family: inherit; font-size: 0.9rem; font-weight: 600;
+    cursor: pointer; transition: 0.15s; -webkit-appearance: none; appearance: none;
+    touch-action: manipulation; border-radius: 6px;
+  }
+  .back-link:active { background: var(--surface-2); }
+  .back-link:hover { color: var(--accent); }
+  html[data-theme="cyber"] .back-link { color: #ff2a9d; }
+  html[data-theme="cyber"] .back-link:hover { color: #00e5ff; }
+  .mode-picker { display: flex; flex-direction: column; align-items: center; padding: 3rem 1rem; text-align: center; }
+  .mode-picker h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+  .mode-picker .lead { color: var(--text-dim); font-size: 1rem; margin-bottom: 2rem; max-width: 520px; }
+  .mode-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; max-width: 720px; width: 100%; }
+  @media (max-width: 620px) { .mode-cards { grid-template-columns: 1fr; } }
+  .mode-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    padding: 1.6rem 1.4rem; cursor: pointer; text-align: left;
+    box-shadow: var(--shadow); transition: 0.2s;
+    display: flex; flex-direction: column; gap: 0.6rem;
+    -webkit-appearance: none; appearance: none; touch-action: manipulation;
+    user-select: none; -webkit-user-select: none;
+  }
+  .mode-card:hover { border-color: var(--accent); box-shadow: var(--shadow-lg); }
+  .mode-card:active { transform: scale(0.98); }
+  .mode-card .emoji { font-size: 2rem; }
+  .mode-card .title { font-size: 1.05rem; font-weight: 700; }
+  .mode-card .desc { font-size: 0.85rem; color: var(--text-dim); line-height: 1.5; }
+  .mode-card .cta { margin-top: 0.4rem; font-size: 0.82rem; color: var(--accent); font-weight: 700; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
+  .grid.one-col { grid-template-columns: 1fr; max-width: 640px; margin: 0 auto; }
+  .card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    padding: 1.25rem; box-shadow: var(--shadow); margin-bottom: 1rem;
+    transition: box-shadow 0.3s, border-color 0.3s, background 0.3s;
+  }
+  .card-title {
+    font-size: 1rem; font-weight: 700; margin: 0 0 0.2rem 0; color: var(--text);
+    display: flex; align-items: center; gap: 0.5rem; transition: color 0.3s;
+  }
+  .card-desc { font-size: 0.8rem; color: var(--text-dim); margin-bottom: 1rem; }
+  .field { margin-bottom: 0.8rem; display: flex; flex-direction: column; }
+  .field:last-child { margin-bottom: 0; }
+  .field label { font-size: 0.78rem; font-weight: 600; color: var(--text-dim); margin-bottom: 0.3rem; }
+  .field input, .field select {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+    padding: 0.55rem 0.7rem; font-size: 0.95rem; font-family: inherit; font-weight: 500;
+    color: var(--text); outline: none; transition: 0.15s; width: 100%;
+    -webkit-appearance: none; appearance: none;
+  }
+  .field select {
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%235c6470' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 0.7rem center; padding-right: 2rem;
+  }
+  .field input:focus, .field select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .field input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
+  .field input[type="number"]::-webkit-outer-spin-button,
+  .field input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .row { display: flex; gap: 0.6rem; }
+  .row .field { flex: 1; margin-bottom: 0; }
+  .row .field.small { flex: 0 0 90px; }
+  .happy-control { margin-bottom: 1rem; }
+  .happy-control:last-child { margin-bottom: 0; }
+  .happy-head { display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; margin-bottom: 0.35rem; flex-wrap: wrap; }
+  .happy-head label { font-size: 0.78rem; font-weight: 600; color: var(--text-dim); margin: 0; }
+  .happy-value-badge {
+    display: inline-flex; align-items: center; gap: 0.25rem;
+    background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 0.9rem;
+    padding: 0.1rem 0.55rem; border-radius: 6px; min-width: 2.6rem; justify-content: center;
+    transition: background 0.3s, color 0.3s, box-shadow 0.3s;
+  }
+  .happy-value-badge .of { font-weight: 400; font-size: 0.72rem; opacity: 0.85; }
+  .happy-track { position: relative; height: 8px; background: var(--border); border-radius: 4px; margin: 0.5rem 0 0.4rem; transition: background 0.3s; }
+  .happy-fill { position: absolute; top: 0; left: 0; bottom: 0; background: linear-gradient(90deg, var(--negative), var(--warning), var(--positive)); border-radius: 4px; pointer-events: none; transition: width 0.1s; }
+  .happy-thumb { position: absolute; top: 50%; transform: translate(-50%, -50%); width: 22px; height: 22px; background: var(--surface); border: 3px solid var(--accent); border-radius: 50%; pointer-events: none; box-shadow: 0 2px 6px rgba(0,0,0,0.2); transition: left 0.1s; }
+  .happy-input { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; margin: 0; -webkit-appearance: none; appearance: none; touch-action: manipulation; }
+  .happy-labels { display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-mute); }
+  .happy-two-points { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; }
+  @media (max-width: 500px) { .happy-two-points { grid-template-columns: 1fr; } }
+  .toggles { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.8rem; }
+  .toggles button {
+    background: var(--surface-2); border: 1px solid transparent; padding: 0.5rem 0.9rem; border-radius: 6px;
+    font-family: inherit; font-weight: 600; font-size: 0.8rem; color: var(--text-dim);
+    cursor: pointer; transition: 0.15s; -webkit-appearance: none; appearance: none; touch-action: manipulation;
+  }
+  .toggles button:hover { color: var(--text); border-color: var(--border); }
+  .toggles button:active { transform: scale(0.97); }
+  .toggles button.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .hidden { display: none !important; }
+  .hint { font-size: 0.75rem; color: var(--text-mute); margin-top: 0.3rem; }
+  .hint strong { color: var(--accent); font-weight: 700; }
+  .subsection { background: var(--surface-2); border-radius: 8px; padding: 0.9rem; margin-bottom: 0.8rem; }
+  .subsection-title { font-size: 0.82rem; font-weight: 700; margin: 0 0 0.6rem 0; color: var(--text); text-transform: uppercase; letter-spacing: 0.04em; }
+  .hr { border-top: 1px solid var(--border); margin: 1rem 0; }
+  .search-links { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.4rem; }
+  .search-links a {
+    display: inline-block; background: var(--surface-2); color: var(--accent); text-decoration: none;
+    font-weight: 600; font-size: 0.75rem; padding: 0.35rem 0.7rem; border-radius: 6px;
+    border: 1px solid var(--border); transition: 0.15s; touch-action: manipulation;
+  }
+  .search-links a:hover { background: var(--accent-soft); }
+  .disclaimer { background: var(--warning-soft); border: 1px solid rgba(180,83,9,0.25); border-left: 3px solid var(--warning); border-radius: 8px; margin-bottom: 1rem; overflow: hidden; transition: background 0.3s, border-color 0.3s; }
+  .disclaimer-head { display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; padding: 0.8rem 1rem; cursor: pointer; font-weight: 700; font-size: 0.85rem; color: var(--warning); user-select: none; -webkit-user-select: none; touch-action: manipulation; }
+  .disclaimer-head .arrow { font-size: 0.75rem; transition: transform 0.2s; }
+  .disclaimer.open .disclaimer-head .arrow { transform: rotate(90deg); }
+  .disclaimer-body { display: none; padding: 0 1rem 0.9rem 1rem; font-size: 0.85rem; color: var(--text); line-height: 1.55; }
+  .disclaimer.open .disclaimer-body { display: block; }
+  .disclaimer-body ul { margin: 0.4rem 0 0.6rem 0; padding-left: 1.2rem; }
+  .disclaimer-body li { margin-bottom: 0.25rem; }
+  .disclaimer-body strong { color: var(--warning); }
+  .disclaimer-body .tip { font-size: 0.8rem; color: var(--text-dim); font-style: italic; border-top: 1px solid rgba(180,83,9,0.2); padding-top: 0.6rem; margin-top: 0.4rem; }
+  .results-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.7rem; margin-bottom: 1rem; }
+  .results-grid.three { grid-template-columns: repeat(3, 1fr); }
+  .results-grid.five { grid-template-columns: repeat(5, 1fr); }
+  @media (max-width: 900px) { .results-grid.five { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 700px) { .results-grid, .results-grid.three, .results-grid.five { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 380px) { .results-grid, .results-grid.three, .results-grid.five { grid-template-columns: 1fr; } }
+  .result { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 0.9rem 0.8rem; text-align: center; box-shadow: var(--shadow); transition: box-shadow 0.3s, border-color 0.3s; }
+  .result .lbl { font-size: 0.72rem; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.3rem; }
+  .result .val { font-size: 1.35rem; font-weight: 800; color: var(--text); line-height: 1.15; word-break: break-word; transition: color 0.3s, text-shadow 0.3s; }
+  .result .sub { font-size: 0.7rem; color: var(--text-mute); margin-top: 0.2rem; }
+  .result.accent .val { color: var(--accent); }
+  .result.positive .val { color: var(--positive); }
+  .result.negative .val { color: var(--negative); }
+  .compare { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.1rem; box-shadow: var(--shadow); margin-bottom: 1rem; transition: box-shadow 0.3s, border-color 0.3s, background 0.3s; }
+  .compare-title { font-size: 1rem; font-weight: 700; margin: 0 0 0.9rem 0; }
+  .compare-cols { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.7rem; }
+  .compare-cols.two { grid-template-columns: 1fr 1fr; }
+  @media (max-width: 620px) { .compare-cols, .compare-cols.two { grid-template-columns: 1fr; } }
+  .compare-col { background: var(--surface-2); border-radius: 8px; padding: 0.8rem; }
+  .compare-col h5 { font-size: 0.78rem; font-weight: 700; margin: 0 0 0.5rem 0; color: var(--text); text-transform: uppercase; letter-spacing: 0.04em; }
+  .compare-col .line { display: flex; justify-content: space-between; font-size: 0.82rem; padding: 0.2rem 0; color: var(--text-dim); }
+  .compare-col .line strong { color: var(--text); font-weight: 600; }
+  .compare-col .line.total { border-top: 1px solid var(--border); margin-top: 0.4rem; padding-top: 0.4rem; font-weight: 700; }
+  .compare-col .line.total strong { color: var(--accent); }
+  .bar-wrap { height: 8px; background: var(--surface); border-radius: 4px; overflow: hidden; margin-top: 0.5rem; }
+  .bar { height: 100%; border-radius: 4px; transition: width 0.4s ease; }
+  .chart-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.1rem; box-shadow: var(--shadow); margin-bottom: 1rem; transition: box-shadow 0.3s, border-color 0.3s, background 0.3s; }
+  .chart-title { font-size: 1rem; font-weight: 700; margin: 0 0 0.3rem 0; }
+  .chart-desc { font-size: 0.8rem; color: var(--text-dim); margin-bottom: 0.8rem; }
+  canvas { width: 100%; height: auto; display: block; }
+  .chart-legend { display: flex; gap: 1rem; flex-wrap: wrap; font-size: 0.78rem; color: var(--text-dim); margin-top: 0.5rem; }
+  .chart-legend span::before { content: ''; display: inline-block; width: 14px; height: 3px; margin-right: 0.4rem; vertical-align: middle; border-radius: 2px; }
+  .legend-existing::before { background: var(--accent); }
+  .legend-new::before { background: var(--warning); }
+  .legend-savings::before { background: var(--savings); }
+  .legend-savings-new::before { background: var(--savings-new); }
+  .legend-savings-nocar::before { background: var(--savings-nocar); }
+  .legend-today::before { background: var(--positive); }
+  .legend-happy-now::before { background: var(--accent); }
+  .insight { background: var(--positive-soft); border-left: 3px solid var(--positive); border-radius: 6px; padding: 0.9rem 1rem; margin-top: 0.7rem; font-size: 0.88rem; color: var(--text); line-height: 1.55; transition: background 0.3s, border-color 0.3s; }
+  .insight strong { color: var(--positive); font-weight: 700; }
+  .insight.warn { background: var(--warning-soft); border-left-color: var(--warning); }
+  .insight.warn strong { color: var(--warning); }
+  .insight.bad { background: var(--negative-soft); border-left-color: var(--negative); }
+  .insight.bad strong { color: var(--negative); }
+  .footer-note { text-align: center; font-size: 0.78rem; color: var(--text-mute); margin-top: 1.5rem; padding: 0.8rem; }
+  .savings-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.7rem; margin-top: 0.6rem; }
+  .savings-grid.two { grid-template-columns: 1fr 1fr; }
+  @media (max-width: 620px) { .savings-grid, .savings-grid.two { grid-template-columns: 1fr; } }
+  .savings-card { background: var(--surface-2); border-radius: 8px; padding: 0.8rem; text-align: center; }
+  .savings-card .lbl { font-size: 0.72rem; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.3rem; }
+  .savings-card .val { font-size: 1.15rem; font-weight: 800; line-height: 1.15; word-break: break-word; }
+  .savings-card.keep .val { color: var(--savings); }
+  .savings-card.new .val { color: var(--savings-new); }
+  .savings-card.nocar .val { color: var(--savings-nocar); }
+  .savings-card .sub { font-size: 0.7rem; color: var(--text-mute); margin-top: 0.2rem; }
+  .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.45); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 1rem; }
+  html[data-theme="cyber"] .modal-bg { background: rgba(10,6,18,0.8); }
+  .modal-bg.visible { display: flex; }
+  .modal { background: var(--surface); border-radius: 12px; padding: 1.5rem; max-width: 480px; width: 100%; box-shadow: var(--shadow-lg); border: 1px solid var(--border); }
+  .modal h3 { margin: 0 0 0.6rem 0; font-size: 1.1rem; font-weight: 700; }
+  .modal p { font-size: 0.85rem; color: var(--text-dim); margin: 0 0 1rem 0; line-height: 1.55; }
+  .modal .check-row { display: flex; align-items: flex-start; gap: 0.6rem; padding: 0.7rem 0.8rem; background: var(--surface-2); border-radius: 8px; margin-bottom: 0.5rem; cursor: pointer; touch-action: manipulation; }
+  .modal .check-row input { margin-top: 0.2rem; accent-color: var(--accent); cursor: pointer; }
+  .modal .check-row .text { flex: 1; }
+  .modal .check-row .text strong { display: block; font-size: 0.88rem; margin-bottom: 0.1rem; }
+  .modal .check-row .text span { font-size: 0.78rem; color: var(--text-dim); }
+  .modal .actions { display: flex; gap: 0.5rem; margin-top: 1rem; justify-content: flex-end; }
+  .modal .actions button { padding: 0.6rem 1.1rem; border-radius: 8px; font-family: inherit; font-weight: 600; font-size: 0.9rem; cursor: pointer; border: 1px solid var(--border); background: var(--surface); color: var(--text); -webkit-appearance: none; appearance: none; touch-action: manipulation; }
+  .modal .actions button.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="brand">
+      <div class="mascot" id="mascot">
+        <img src="squirtcar.png" alt="SquirtCar mascot" onerror="this.style.display='none'; this.parentElement.textContent='🚗';">
+      </div>
+      <div class="brand-text">
+        <h1>
+          <span class="brand-name">SquirtCar</span>
+          <span class="brand-tag">— дружелюбный калькулятор владения авто</span>
+        </h1>
+        <div class="header-sub" id="headerSub">Выберите сценарий, чтобы начать</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="share-btn hidden" id="shareBtn" type="button">🔗 Поделиться</button>
+      <div class="theme-switch" id="themeSwitch">
+        <button type="button" data-theme-value="light"><span>☀️</span><span class="label">Светлая</span></button>
+        <button type="button" data-theme-value="dark"><span>🌙</span><span class="label">Тёмная</span></button>
+        <button type="button" data-theme-value="cyber"><span>⚡</span><span class="label">Киберпанк</span></button>
+      </div>
+    </div>
+  </header>
+
+  <div id="modePicker" class="mode-picker">
+    <h1 style="font-size:2rem;">С чего начнём?</h1>
+    <p class="lead">Выберите сценарий — от него зависит, какие поля появятся. Вернуться назад можно в любой момент.</p>
+    <div class="mode-cards">
+      <div class="mode-card" role="button" tabindex="0" data-mode="have">
+        <div class="emoji">🚗</div>
+        <div class="title">У меня уже есть машина</div>
+        <div class="desc">Считаю, сколько стоит текущая, и стоит ли менять её на новую.</div>
+        <div class="cta">Считать →</div>
+      </div>
+      <div class="mode-card" role="button" tabindex="0" data-mode="none">
+        <div class="emoji">🅿️</div>
+        <div class="title">У меня нет машины</div>
+        <div class="desc">Прикидываю, во что обойдётся покупка, и как это повлияет на накопления.</div>
+        <div class="cta">Прикинуть →</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="appBody" class="hidden">
+    <button class="back-link" id="backLink" type="button">← Выбрать другой сценарий</button>
+
+    <div id="modeHave" class="hidden">
+      <div class="grid">
+        <div>
+          <div class="card">
+            <h2 class="card-title">🚗 Текущая машина</h2>
+            <div class="card-desc">Что у вас сейчас и сколько это стоит</div>
+            <div class="field">
+              <label>Марка и модель (для себя)</label>
+              <input type="text" id="carModel" value="Моя текущая машина">
+            </div>
+            <div class="field">
+              <label>Найти цены и характеристики</label>
+              <div class="search-links">
+                <a href="https://auto.ru/cars/used/" target="_blank" rel="noopener">Auto.ru — б/у</a>
+                <a href="https://www.avito.ru/rossiya/avtomobili" target="_blank" rel="noopener">Avito</a>
+                <a href="https://www.drom.ru/" target="_blank" rel="noopener">Drom</a>
+                <a href="https://www.autostat.ru/" target="_blank" rel="noopener">Автостат</a>
+              </div>
+            </div>
+            <div class="hr"></div>
+            <div class="row">
+              <div class="field"><label>Цена покупки (₽)</label><input type="number" id="purchasePrice" value="2000000" step="50000" min="0"></div>
+              <div class="field small"><label>Год</label><input type="number" id="purchaseYear" value="2021" step="1" min="1950" max="2030"></div>
+            </div>
+            <div class="field"><label>Пробег за год (км)</label><input type="number" id="distanceValue" value="15000" step="500" min="1"></div>
+            <div class="subsection">
+              <div class="subsection-title">Расходы в год</div>
+              <div class="toggles" id="fuelModeToggle">
+                <button type="button" data-mode="manual" class="active" id="btnFuelManual">Вручную (₽/год)</button>
+                <button type="button" data-mode="price" id="btnFuelPrice">От цены топлива</button>
+              </div>
+              <div id="fuelManualFields">
+                <div class="field"><label>⛽ Топливо / электричество</label><input type="number" id="fuelCost" value="96000" step="1000" min="0"></div>
+              </div>
+              <div id="fuelPriceFields" class="hidden">
+                <div class="row">
+                  <div class="field"><label>Цена за литр / кВт·ч (₽)</label><input type="number" id="fuelPrice" value="60" step="0.5" min="0"></div>
+                  <div class="field"><label>Расход</label>
+                    <select id="consumptionUnit">
+                      <option value="per100" selected>л/100 км</option>
+                      <option value="kmPer">км/л</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="field"><label>Расход (значение)</label><input type="number" id="consumptionValue" value="8.5" step="0.1" min="0"></div>
+                <div class="hint">Расчётная стоимость топлива: <strong id="fuelComputedDisplay">—</strong> ₽/год</div>
+              </div>
+              <div class="field" style="margin-top:0.8rem;"><label>🛡️ Страховка</label><input type="number" id="insurance" value="24000" step="1000" min="0"></div>
+              <div class="field"><label>🔧 ТО и ремонт</label><input type="number" id="maintenance" value="30000" step="1000" min="0"></div>
+              <div class="field"><label>📄 Налоги и сборы</label><input type="number" id="taxes" value="12000" step="500" min="0"></div>
+              <div class="field"><label>🅿️ Парковка / прочее</label><input type="number" id="other" value="18000" step="1000" min="0"></div>
+            </div>
+            <div class="subsection">
+              <div class="subsection-title">Амортизация</div>
+              <div class="toggles" id="depreciationToggle">
+                <button type="button" data-mode="manual" class="active" id="btnDepManual">Вручную</button>
+                <button type="button" data-mode="auto" id="btnDepAuto">От рыночной цены</button>
+              </div>
+              <div id="depManualFields">
+                <div class="field"><label>Потеря стоимости в год (₽)</label><input type="number" id="depreciationManual" value="120000" step="5000" min="0"></div>
+              </div>
+              <div id="depAutoFields" class="hidden">
+                <div class="field"><label>Текущая рыночная цена (₽)</label><input type="number" id="currentMarketPrice" value="1400000" step="50000" min="0"></div>
+                <div class="hint" id="autoDepreciationInfo">Потери в год: —</div>
+              </div>
+            </div>
+            <div class="subsection">
+              <div class="subsection-title">Кредит на текущую</div>
+              <div class="toggles" id="creditToggle">
+                <button type="button" data-mode="off" class="active" id="btnCreditOff">Без кредита</button>
+                <button type="button" data-mode="on" id="btnCreditOn">Есть кредит</button>
+              </div>
+              <div id="creditFields" class="hidden">
+                <div class="row">
+                  <div class="field"><label>Платёж в месяц (₽)</label><input type="number" id="monthlyPayment" value="25000" step="1000" min="0"></div>
+                  <div class="field small"><label>Ставка %</label><input type="number" id="interestRate" value="19.2" step="0.1" min="0"></div>
+                </div>
+                <div class="row">
+                  <div class="field"><label>Срок (мес)</label><input type="number" id="totalMonths" value="60" step="6" min="1"></div>
+                  <div class="field"><label>Уже выплачено</label><input type="number" id="monthsAlreadyPaid" value="24" step="1" min="0"></div>
+                </div>
+                <div class="hint">Выплаты: <strong id="creditYearlyDisplay">0</strong> ₽/год · Переплата: <strong id="creditOverpayDisplay">0</strong> ₽</div>
+              </div>
+            </div>
+            <div class="subsection">
+              <div class="subsection-title">😊 Счастье от машины</div>
+              <div class="happy-two-points">
+                <div class="happy-control">
+                  <div class="happy-head"><label>Когда купили</label><span class="happy-value-badge"><span id="happyAtPurchaseVal">9</span><span class="of">/10</span></span></div>
+                  <div class="happy-track">
+                    <div class="happy-fill" id="happyAtPurchaseFill"></div>
+                    <div class="happy-thumb" id="happyAtPurchaseThumb"></div>
+                    <input type="range" class="happy-input" id="happyAtPurchaseRange" min="1" max="10" step="1" value="9">
+                  </div>
+                  <div class="happy-labels"><span>1</span><span>5</span><span>10</span></div>
+                </div>
+                <div class="happy-control">
+                  <div class="happy-head"><label>Сейчас</label><span class="happy-value-badge"><span id="happyNowVal">6</span><span class="of">/10</span></span></div>
+                  <div class="happy-track">
+                    <div class="happy-fill" id="happyNowFill"></div>
+                    <div class="happy-thumb" id="happyNowThumb"></div>
+                    <input type="range" class="happy-input" id="happyNowRange" min="1" max="10" step="1" value="6">
+                  </div>
+                  <div class="happy-labels"><span>1</span><span>5</span><span>10</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="card">
+            <h2 class="card-title">🆕 Новая машина</h2>
+            <div class="card-desc">Что вы рассматриваете и во сколько это обойдётся</div>
+            <div class="field"><label>Марка и модель (для себя)</label><input type="text" id="newCarModel" value="Новая машина"></div>
+            <div class="field"><label>Цена новой машины (₽)</label><input type="number" id="newCarPrice" value="3000000" step="100000" min="0"></div>
+            <div class="field"><label>Пробег за год (км)</label><input type="number" id="newCarDistance" value="15000" step="500" min="1"></div>
+            <div class="subsection">
+              <div class="subsection-title">🕒 Поездки и время</div>
+              <div class="row">
+                <div class="field"><label>Поездок в неделю</label><input type="number" id="tripsPerWeek" value="5" step="1" min="0"></div>
+                <div class="field"><label>Длина в одну сторону (км)</label><input type="number" id="commuteDistance" value="15" step="1" min="0"></div>
+              </div>
+              <div class="row" style="margin-top:0.6rem;">
+                <div class="field"><label>Время сейчас (мин)</label><input type="number" id="commuteTimeNow" value="45" step="1" min="0"></div>
+                <div class="field"><label>Время на новой (мин)</label><input type="number" id="commuteTimeNew" value="25" step="1" min="0"></div>
+              </div>
+              <div class="hint">Разница в минутах × число поездок. Если альтернативы нет — 0.</div>
+            </div>
+            <div class="toggles" id="paymentModeToggle">
+              <button type="button" data-mode="credit" class="active" id="btnPayCredit">В кредит</button>
+              <button type="button" data-mode="cash" id="btnPayCash">За наличные</button>
+            </div>
+            <div class="toggles" id="tradeInToggle">
+              <button type="button" data-mode="on" class="active" id="btnTradeInOn">Учесть продажу старой</button>
+              <button type="button" data-mode="off" id="btnTradeInOff">Без продажи</button>
+            </div>
+            <div id="tradeInFields">
+              <div class="row">
+                <div class="field"><label>Цена продажи текущей (₽)</label><input type="number" id="tradeInValue" value="1400000" step="50000" min="0"></div>
+                <div class="field small" style="flex:0 0 auto; justify-content: flex-end;">
+                  <label style="visibility:hidden;">.</label>
+                  <button type="button" id="btnUseResidual" style="padding:0.5rem 0.7rem;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);cursor:pointer;font-family:inherit;font-weight:600;font-size:0.78rem;color:var(--text);-webkit-appearance:none;appearance:none;touch-action:manipulation;">= остаточная</button>
+                </div>
+              </div>
+            </div>
+            <div id="creditOnlyFields">
+              <div class="row">
+                <div class="field"><label>Первый взнос (₽)</label><input type="number" id="newCarDownPayment" value="600000" step="50000" min="0"></div>
+                <div class="field small"><label>Ставка %</label><input type="number" id="newCarRate" value="19.2" step="0.1" min="0"></div>
+              </div>
+              <div class="field"><label>Срок кредита (мес)</label><input type="number" id="newCarTerm" value="60" step="6" min="1"></div>
+            </div>
+            <div class="field"><label>Рост эксплуатационных расходов (% в год)</label><input type="number" id="newCarOpGrowth" value="5" step="0.5" min="0" max="20"></div>
+            <div class="hint">База = расходы текущей (<strong id="newCarOpBaseDisplay">—</strong> ₽/год).</div>
+            <div class="hr"></div>
+            <div class="compare" style="box-shadow:none;padding:0;border:none;margin:0;">
+              <div class="compare-cols two">
+                <div class="compare-col">
+                  <h5>Кредит</h5>
+                  <div class="line"><span>Сумма</span><strong id="loanAmount">0 ₽</strong></div>
+                  <div class="line"><span>Платёж / мес</span><strong id="loanMonthly">0 ₽</strong></div>
+                </div>
+                <div class="compare-col">
+                  <h5>Переплата</h5>
+                  <div class="line"><span>Проценты</span><strong id="loanOverpay">0 ₽</strong></div>
+                  <div class="line"><span>Реальная цена</span><strong id="loanRealPrice">0 ₽</strong></div>
+                </div>
+              </div>
+            </div>
+            <div class="insight" id="loanComparison" style="margin-top:0.8rem;font-size:0.82rem;">Заполните параметры.</div>
+          </div>
+          <div class="card">
+            <h2 class="card-title">🏠 Ваша жизнь и накопления</h2>
+            <div class="card-desc">Обычные расходы, доход и сколько у вас уже отложено</div>
+            <div class="row">
+              <div class="field"><label>🥗 Еда и продукты (₽/мес)</label><input type="number" id="expFood" value="25000" step="1000" min="0"></div>
+              <div class="field"><label>🏠 Жильё и коммуналка (₽/мес)</label><input type="number" id="expHousing" value="35000" step="1000" min="0"></div>
+            </div>
+            <div class="row">
+              <div class="field"><label>📱 Связь и подписки (₽/мес)</label><input type="number" id="expComms" value="3000" step="500" min="0"></div>
+              <div class="field"><label>💊 Здоровье и прочее (₽/мес)</label><input type="number" id="expOther" value="15000" step="1000" min="0"></div>
+            </div>
+            <div class="row">
+              <div class="field"><label>💰 Доход в месяц (₽)</label><input type="number" id="monthlyIncome" value="120000" step="5000" min="0"></div>
+              <div class="field"><label>🏦 Текущие накопления (₽)</label><input type="number" id="currentSavings" value="500000" step="50000" min="0"></div>
+            </div>
+            <div class="field"><label>📈 Годовой % на накопления</label><input type="number" id="savingsRate" value="8" step="0.5" min="0" max="30"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="results-grid five">
+        <div class="result"><div class="lbl">Текущая: в месяц</div><div class="val" id="resultCurrentMonthly">0</div><div class="sub">₽ / месяц</div></div>
+        <div class="result accent"><div class="lbl">Новая: в месяц</div><div class="val" id="resultNewMonthly">0</div><div class="sub">₽ / месяц</div></div>
+        <div class="result"><div class="lbl">Разница</div><div class="val" id="resultDiff">0</div><div class="sub">₽ / месяц</div></div>
+        <div class="result" id="resultHappinessCard"><div class="lbl">Счастье за деньги</div><div class="val" id="resultHappinessPerMoney">—</div><div class="sub">очков на 1000 ₽</div></div>
+        <div class="result positive" id="resultTimeSavedCard"><div class="lbl">Время сэкономлено</div><div class="val" id="resultTimeSaved">—</div><div class="sub" id="resultTimeSavedSub">ч / месяц</div></div>
+      </div>
+
+      <div class="compare">
+        <h3 class="compare-title">📊 Куда уходят деньги</h3>
+        <div class="compare-cols">
+          <div class="compare-col">
+            <h5>Текущая машина</h5>
+            <div class="line"><span>Эксплуатация</span><strong id="cmpCurrentOperating">0 ₽</strong></div>
+            <div class="line"><span>Амортизация</span><strong id="cmpCurrentDep">0 ₽</strong></div>
+            <div class="line"><span>Кредит</span><strong id="cmpCurrentCredit">0 ₽</strong></div>
+            <div class="line total"><span>Итого / мес</span><strong id="cmpCurrentTotal">0 ₽</strong></div>
+            <div class="bar-wrap"><div class="bar" id="cmpCurrentBar" style="width:0%;background:var(--accent);"></div></div>
+            <div class="line" style="margin-top:0.5rem;"><span>Доля дохода</span><strong id="cmpCurrentShare">0%</strong></div>
+          </div>
+          <div class="compare-col">
+            <h5>Новая машина</h5>
+            <div class="line"><span>Эксплуатация</span><strong id="cmpNewOperating">0 ₽</strong></div>
+            <div class="line"><span>Амортизация</span><strong id="cmpNewDep">0 ₽</strong></div>
+            <div class="line"><span>Кредит</span><strong id="cmpNewCredit">0 ₽</strong></div>
+            <div class="line total"><span>Итого / мес</span><strong id="cmpNewTotal">0 ₽</strong></div>
+            <div class="bar-wrap"><div class="bar" id="cmpNewBar" style="width:0%;background:var(--warning);"></div></div>
+            <div class="line" style="margin-top:0.5rem;"><span>Доля дохода</span><strong id="cmpNewShare">0%</strong></div>
+          </div>
+          <div class="compare-col">
+            <h5>Остальная жизнь</h5>
+            <div class="line"><span>Еда</span><strong id="cmpFood">0 ₽</strong></div>
+            <div class="line"><span>Жильё</span><strong id="cmpHousing">0 ₽</strong></div>
+            <div class="line"><span>Связь и прочее</span><strong id="cmpComms">0 ₽</strong></div>
+            <div class="line total"><span>Итого / мес</span><strong id="cmpLifeTotal">0 ₽</strong></div>
+            <div class="bar-wrap"><div class="bar" id="cmpLifeBar" style="width:0%;background:var(--positive);"></div></div>
+            <div class="line" style="margin-top:0.5rem;"><span>Доля дохода</span><strong id="cmpLifeShare">0%</strong></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="modeNone" class="hidden">
+      <div class="grid one-col">
+        <div>
+          <div class="disclaimer open" id="ncDisclaimer">
+            <div class="disclaimer-head" id="ncDisclaimerHead" role="button" tabindex="0">
+              <span>⚠️ Что входит в стоимость владения (о чём часто забывают)</span>
+              <span class="arrow">▶</span>
+            </div>
+            <div class="disclaimer-body">
+              <p style="margin-top:0;">Реальная стоимость машины — это не только цена и бензин. Ниже список того, что стоит держать в голове при расчёте:</p>
+              <ul>
+                <li><strong>Сезонные шины.</strong> Летний + зимний комплект = 40–120 тыс. ₽, плюс переобувка дважды в год.</li>
+                <li><strong>Замена масла и ТО.</strong> 8–25 тыс. ₽ каждые 10–15 тыс. км пробега.</li>
+                <li><strong>Поломки и внеплановый ремонт.</strong> Даже на новой машине что-то случается после гарантии.</li>
+                <li><strong>Страховка.</strong> ОСАГО обязательно, КАСКО для новой часто обязательно по условиям кредита.</li>
+                <li><strong>Парковка.</strong> Платные парковки, резидентные разрешения, гараж или место у дома.</li>
+                <li><strong>Транспортный налог.</strong> Зависит от мощности двигателя и региона.</li>
+                <li><strong>Техосмотр.</strong> Раз в год или два, плюс возможные доработки.</li>
+                <li><strong>Мойка, химия, мелкие аксессуары.</strong> Копейки по отдельности, но набегает.</li>
+                <li><strong>Амортизация.</strong> Самая большая и незаметная статья — машина теряет в цене каждый день.</li>
+                <li><strong>Проценты по кредиту.</strong> Если берёте в кредит — реальная цена вырастает на 30–60%.</li>
+              </ul>
+              <div class="tip">💡 Не поленитесь заглянуть на Auto.ru, Avito и Дром, чтобы оценить реальные цены на запчасти и обслуживание конкретно вашей модели.</div>
+            </div>
+          </div>
+          <div class="card">
+            <h2 class="card-title">🚗 Машина, которую рассматриваете</h2>
+            <div class="card-desc">Что вы хотите купить и как планируете платить</div>
+            <div class="field"><label>Марка и модель (для себя)</label><input type="text" id="ncCarModel" value="Машина, которую хочу"></div>
+            <div class="field">
+              <label>Найти цены</label>
+              <div class="search-links">
+                <a href="https://auto.ru/cars/new/" target="_blank" rel="noopener">Auto.ru — новые</a>
+                <a href="https://auto.ru/cars/used/" target="_blank" rel="noopener">Auto.ru — б/у</a>
+                <a href="https://www.avito.ru/rossiya/avtomobili" target="_blank" rel="noopener">Avito</a>
+                <a href="https://www.drom.ru/" target="_blank" rel="noopener">Drom</a>
+              </div>
+            </div>
+            <div class="field"><label>Цена машины (₽)</label><input type="number" id="ncPrice" value="2000000" step="100000" min="0"></div>
+            <div class="field"><label>Пробег за год (км)</label><input type="number" id="ncDistance" value="15000" step="500" min="1"></div>
+            <div class="subsection">
+              <div class="subsection-title">🕒 Поездки и время</div>
+              <div class="row">
+                <div class="field"><label>Поездок в неделю</label><input type="number" id="ncTripsPerWeek" value="5" step="1" min="0"></div>
+                <div class="field"><label>Длина в одну сторону (км)</label><input type="number" id="ncCommuteDistance" value="15" step="1" min="0"></div>
+              </div>
+              <div class="row" style="margin-top:0.6rem;">
+                <div class="field"><label>Время сейчас (мин)</label><input type="number" id="ncCommuteTimeNow" value="50" step="1" min="0"></div>
+                <div class="field"><label>Время на машине (мин)</label><input type="number" id="ncCommuteTimeNew" value="25" step="1" min="0"></div>
+              </div>
+              <div class="hint">Сравните ваш текущий путь (общественный транспорт, пешком) с поездкой на машине.</div>
+            </div>
+            <div class="toggles" id="ncPaymentToggle">
+              <button type="button" data-mode="credit" class="active" id="ncBtnCredit">В кредит</button>
+              <button type="button" data-mode="cash" id="ncBtnCash">За наличные</button>
+            </div>
+            <div id="ncCreditFields">
+              <div class="row">
+                <div class="field"><label>Первый взнос (₽)</label><input type="number" id="ncDownPayment" value="400000" step="50000" min="0"></div>
+                <div class="field small"><label>Ставка %</label><input type="number" id="ncRate" value="19.2" step="0.1" min="0"></div>
+              </div>
+              <div class="field"><label>Срок кредита (мес)</label><input type="number" id="ncTerm" value="60" step="6" min="1"></div>
+            </div>
+            <div class="subsection">
+              <div class="subsection-title">Расходы на машину в год</div>
+              <div class="toggles" id="ncFuelModeToggle">
+                <button type="button" data-mode="manual" class="active" id="ncBtnFuelManual">Вручную</button>
+                <button type="button" data-mode="price" id="ncBtnFuelPrice">От цены топлива</button>
+              </div>
+              <div id="ncFuelManualFields">
+                <div class="field"><label>⛽ Топливо / электричество</label><input type="number" id="ncFuel" value="96000" step="1000" min="0"></div>
+              </div>
+              <div id="ncFuelPriceFields" class="hidden">
+                <div class="row">
+                  <div class="field"><label>Цена за литр / кВт·ч (₽)</label><input type="number" id="ncFuelPrice" value="60" step="0.5" min="0"></div>
+                  <div class="field"><label>Расход</label>
+                    <select id="ncConsumptionUnit">
+                      <option value="per100" selected>л/100 км</option>
+                      <option value="kmPer">км/л</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="field"><label>Расход (значение)</label><input type="number" id="ncConsumptionValue" value="8.5" step="0.1" min="0"></div>
+                <div class="hint">Расчётная стоимость: <strong id="ncFuelComputedDisplay">—</strong> ₽/год</div>
+              </div>
+              <div class="field" style="margin-top:0.8rem;"><label>🛡️ Страховка</label><input type="number" id="ncInsurance" value="24000" step="1000" min="0"></div>
+              <div class="field"><label>🔧 ТО и ремонт</label><input type="number" id="ncMaintenance" value="30000" step="1000" min="0"></div>
+              <div class="field"><label>📄 Налоги и сборы</label><input type="number" id="ncTaxes" value="12000" step="500" min="0"></div>
+              <div class="field"><label>🅿️ Парковка / прочее</label><input type="number" id="ncOther" value="18000" step="1000" min="0"></div>
+            </div>
+          </div>
+          <div class="card">
+            <h2 class="card-title">🏠 Ваша жизнь и накопления</h2>
+            <div class="card-desc">Обычные расходы, доход и сколько у вас уже отложено</div>
+            <div class="row">
+              <div class="field"><label>🥗 Еда и продукты (₽/мес)</label><input type="number" id="ncExpFood" value="25000" step="1000" min="0"></div>
+              <div class="field"><label>🏠 Жильё и коммуналка (₽/мес)</label><input type="number" id="ncExpHousing" value="35000" step="1000" min="0"></div>
+            </div>
+            <div class="row">
+              <div class="field"><label>📱 Связь и подписки (₽/мес)</label><input type="number" id="ncExpComms" value="3000" step="500" min="0"></div>
+              <div class="field"><label>💊 Здоровье и прочее (₽/мес)</label><input type="number" id="ncExpOther" value="15000" step="1000" min="0"></div>
+            </div>
+            <div class="row">
+              <div class="field"><label>💰 Доход в месяц (₽)</label><input type="number" id="ncMonthlyIncome" value="120000" step="5000" min="0"></div>
+              <div class="field"><label>🏦 Текущие накопления (₽)</label><input type="number" id="ncCurrentSavings" value="500000" step="50000" min="0"></div>
+            </div>
+            <div class="field"><label>📈 Годовой % на накопления</label><input type="number" id="ncSavingsRate" value="8" step="0.5" min="0" max="30"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="results-grid three">
+        <div class="result accent"><div class="lbl">Машина: в месяц</div><div class="val" id="ncResultMonthly">0</div><div class="sub">₽ / месяц</div></div>
+        <div class="result"><div class="lbl">Доля дохода</div><div class="val" id="ncResultShare">0%</div><div class="sub">от месячного дохода</div></div>
+        <div class="result positive" id="ncResultTimeSavedCard"><div class="lbl">Время сэкономлено</div><div class="val" id="ncResultTimeSaved">—</div><div class="sub" id="ncResultTimeSavedSub">ч / месяц</div></div>
+      </div>
+
+      <div class="compare">
+        <h3 class="compare-title">📊 Куда уходят деньги</h3>
+        <div class="compare-cols two">
+          <div class="compare-col">
+            <h5>Если купить машину</h5>
+            <div class="line"><span>Эксплуатация</span><strong id="ncCmpOperating">0 ₽</strong></div>
+            <div class="line"><span>Амортизация</span><strong id="ncCmpDep">0 ₽</strong></div>
+            <div class="line"><span>Кредит</span><strong id="ncCmpCredit">0 ₽</strong></div>
+            <div class="line total"><span>Итого / мес</span><strong id="ncCmpTotal">0 ₽</strong></div>
+            <div class="bar-wrap"><div class="bar" id="ncCmpCarBar" style="width:0%;background:var(--warning);"></div></div>
+          </div>
+          <div class="compare-col">
+            <h5>Остальная жизнь</h5>
+            <div class="line"><span>Еда</span><strong id="ncCmpFood">0 ₽</strong></div>
+            <div class="line"><span>Жильё</span><strong id="ncCmpHousing">0 ₽</strong></div>
+            <div class="line"><span>Связь и прочее</span><strong id="ncCmpComms">0 ₽</strong></div>
+            <div class="line total"><span>Итого / мес</span><strong id="ncCmpLifeTotal">0 ₽</strong></div>
+            <div class="bar-wrap"><div class="bar" id="ncCmpLifeBar" style="width:0%;background:var(--positive);"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chart-wrap">
+      <h3 class="chart-title">📈 Стоимость владения по годам</h3>
+      <div class="chart-desc" id="costChartDesc">Сколько стоит километр с учётом амортизации, эксплуатации и кредита</div>
+      <canvas id="costCurveCanvas" width="1100" height="340"></canvas>
+      <div class="chart-legend">
+        <span class="legend-existing" id="legendExisting">Текущая машина (₽/км)</span>
+        <span class="legend-new">Новая / рассматриваемая (₽/км)</span>
+        <span class="legend-today">Сегодня</span>
+      </div>
+    </div>
+
+    <div class="chart-wrap" id="happinessChartWrap">
+      <h3 class="chart-title">😊 Счастье от машины</h3>
+      <div class="chart-desc">Текущая: линия между «тогда» и «сейчас» продолжена в будущее.</div>
+      <canvas id="happinessCanvas" width="1100" height="300"></canvas>
+      <div class="chart-legend"><span class="legend-happy-now">Текущая машина</span></div>
+      <div class="insight" id="happinessInsight" style="margin-top:0.7rem;">Заполните оценки счастья.</div>
+    </div>
+
+    <div class="chart-wrap">
+      <h3 class="chart-title">🏦 Ваши накопления: с машиной и без</h3>
+      <div class="chart-desc" id="savingsChartDesc">Как изменятся накопления при разных сценариях</div>
+      <canvas id="savingsCanvas" width="1100" height="340"></canvas>
+      <div class="chart-legend">
+        <span class="legend-savings" id="legendSavKeep">Оставить текущую</span>
+        <span class="legend-savings-new" id="legendSavNew">Купить новую</span>
+        <span class="legend-savings-nocar" id="legendSavNoCar">Без машины вообще</span>
+      </div>
+    </div>
+
+    <div class="compare">
+      <h3 class="compare-title">💰 Итог через 10 лет</h3>
+      <div class="savings-grid" id="savingsCards">
+        <div class="savings-card keep" id="savCardKeep">
+          <div class="lbl">Оставить текущую</div><div class="val" id="savKeepVal">0 ₽</div><div class="sub">накоплений через 10 лет</div>
+        </div>
+        <div class="savings-card new">
+          <div class="lbl">Купить новую</div><div class="val" id="savNewVal">0 ₽</div><div class="sub">накоплений через 10 лет</div>
+        </div>
+        <div class="savings-card nocar">
+          <div class="lbl">Без машины вообще</div><div class="val" id="savNoCarVal">0 ₽</div><div class="sub">накоплений через 10 лет</div>
+        </div>
+      </div>
+      <div class="insight" id="savingsInsight" style="margin-top:0.9rem;">Заполните данные.</div>
+    </div>
+
+    <div class="footer-note">SquirtCar · расчёты — оценочные. «Счастье за деньги» — субъективная метрика.</div>
+  </div>
+</div>
+
+<div class="modal-bg" id="shareModal">
+  <div class="modal">
+    <h3>🔗 Поделиться расчётом</h3>
+    <p>Будет создан HTML-файл, который можно открыть в любом браузере. Все данные по машинам и счастью всегда включены.</p>
+    <label class="check-row">
+      <input type="checkbox" id="shareIncludePersonal" checked>
+      <div class="text"><strong>Включить личные расходы</strong><span>Еда, жильё, связь, здоровье, доход</span></div>
+    </label>
+    <label class="check-row">
+      <input type="checkbox" id="shareIncludeSavings" checked>
+      <div class="text"><strong>Включить накопления</strong><span>Текущий баланс и годовая ставка</span></div>
+    </label>
+    <div class="actions">
+      <button type="button" id="shareCancel">Отмена</button>
+      <button type="button" class="primary" id="shareDownload">Скачать HTML</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  function showFatal(err) {
+    try {
+      let bar = document.getElementById('fatalBar');
+      if (!bar) {
+        bar = document.createElement('div');
+        bar.id = 'fatalBar';
+        bar.style.cssText = 'position:fixed;left:0;right:0;bottom:0;z-index:9999;' +
+          'background:#b91c1c;color:#fff;font:12px/1.4 -apple-system,system-ui,sans-serif;' +
+          'padding:0.6rem 0.8rem;white-space:pre-wrap;word-break:break-word;';
+        document.body.appendChild(bar);
+      }
+      bar.textContent = 'Ошибка: ' + (err && (err.message || err.reason) ? (err.message || err.reason) : String(err));
+    } catch (e) {}
+  }
+  window.addEventListener('error', (e) => showFatal(e.error || e.message));
+  window.addEventListener('unhandledrejection', (e) => showFatal(e.reason));
+
+  function safe(id) {
+    const el = document.getElementById(id);
+    if (!el) console.warn('[app] Missing #' + id);
+    return el;
+  }
+  function num(el) {
+    if (!el) return 0;
+    const v = parseFloat(el.value);
+    return isFinite(v) && v > 0 ? v : 0;
+  }
+  function intInRange(el, min, max, fallback) {
+    if (!el) return fallback;
+    let v = parseInt(el.value, 10);
+    if (!isFinite(v)) v = fallback;
+    if (v < min) v = min;
+    if (v > max) v = max;
+    return v;
+  }
+  function fmt(v) {
+    if (!isFinite(v) || isNaN(v)) return '0';
+    return Math.round(v).toLocaleString('ru-RU');
+  }
+  function setText(id, txt) {
+    const el = safe(id);
+    if (el) el.textContent = txt;
+  }
+  function escapeHtml(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+  // Единственный путь — click. Все тап-цели имеют touch-action: manipulation,
+  // поэтому на iOS задержки 300ms нет и отдельный touchend-обработчик не нужен.
+  // Ручной touchend + preventDefault ломался в WKWebView (Telegram, iOS Safari):
+  // synthetic click подавлялся, а флаг дедупликации мог залипнуть навсегда.
+  function onTap(el, fn) {
+    if (!el) return;
+    el.addEventListener('click', () => {
+      try { fn(); } catch (err) { showFatal(err); }
+    });
+  }
+
+  const state = {
+    mode: null,
+    depreciationMode: 'manual',
+    creditMode: 'off',
+    tradeInMode: 'on',
+    paymentMode: 'credit',
+    fuelMode: 'manual',
+    ncPaymentMode: 'credit',
+    ncFuelMode: 'manual'
+  };
+
+  function computeAnnuity(principal, ratePct, months) {
+    if (principal <= 0 || months <= 0) return { monthly: 0, overpay: 0 };
+    const mr = ratePct / 100 / 12;
+    let monthly;
+    if (mr <= 0) monthly = principal / months;
+    else monthly = principal * mr * Math.pow(1 + mr, months) / (Math.pow(1 + mr, months) - 1);
+    const total = monthly * months;
+    return { monthly, overpay: total - principal };
+  }
+  function computeFuelAnnual(distance, price, consumptionValue, unit) {
+    if (distance <= 0 || price <= 0 || consumptionValue <= 0) return 0;
+    const litersPerYear = unit === 'per100' ? (distance / 100) * consumptionValue : distance / consumptionValue;
+    return litersPerYear * price;
+  }
+  function computeTimeSaved(trips, timeNow, timeNew) {
+    if (trips <= 0 || timeNow <= 0 || timeNew <= 0) return { hoursPerMonth: 0, hoursPerYear: 0 };
+    const diffPerTrip = timeNow - timeNew;
+    const minPerWeek = diffPerTrip * trips * 2;
+    const hoursPerWeek = minPerWeek / 60;
+    return { hoursPerMonth: hoursPerWeek * 4.33, hoursPerYear: hoursPerWeek * 52 };
+  }
+  function simulateSavings(years, monthlyOutflow, monthlyNet, startCapital, rateAnnual) {
+    const months = years * 12;
+    const monthlyRate = Math.pow(1 + rateAnnual, 1 / 12) - 1;
+    let bal = startCapital;
+    const points = [{ year: 0, value: bal }];
+    for (let m = 1; m <= months; m++) {
+      bal = bal * (1 + monthlyRate) + monthlyNet - monthlyOutflow;
+      if (m % 12 === 0) points.push({ year: m / 12, value: bal });
+    }
+    return points;
+  }
+  function buildCurve(maxYears, opts) {
+    const pts = [];
+    for (let y = 0; y <= maxYears; y++) {
+      const age = opts.startAge + y;
+      const operating = opts.operatingBase * Math.pow(1 + opts.operatingGrowth, y);
+      const floor = opts.purchasePrice * 0.10;
+      const value = Math.max(floor, opts.purchasePrice * Math.pow(0.85, age));
+      const valueNext = Math.max(floor, opts.purchasePrice * Math.pow(0.85, age + 1));
+      const dep = value - valueNext;
+      let credit = 0;
+      if (opts.creditMonthly > 0 && opts.totalMonths > 0) {
+        const paidStart = opts.creditStartOffset || 0;
+        const paidStartYear = paidStart + y * 12;
+        const paidEndYear = paidStart + (y + 1) * 12;
+        const remStart = Math.max(0, opts.totalMonths - paidStartYear);
+        const remEnd = Math.max(0, opts.totalMonths - paidEndYear);
+        credit = opts.creditMonthly * Math.max(0, remStart - remEnd);
+      }
+      const purchaseHit = (y === 0 && opts.includePurchaseInYear0) ? opts.purchasePrice : 0;
+      const oneTime = (y === 0 && opts.oneTimeYear0) ? opts.oneTimeYear0 : 0;
+      const total = operating + dep + credit + purchaseHit + oneTime;
+      pts.push({ year: y, calendarYear: opts.startCalendarYear + y, perKm: total / Math.max(1, opts.annualKm), total });
+    }
+    return pts;
+  }
+
+  const modePicker = safe('modePicker');
+  const appBody = safe('appBody');
+  const modeHave = safe('modeHave');
+  const modeNone = safe('modeNone');
+  const headerSub = safe('headerSub');
+  const shareBtn = safe('shareBtn');
+  const backLink = safe('backLink');
+
+  const purchasePrice = safe('purchasePrice');
+  const purchaseYear = safe('purchaseYear');
+  const distanceValue = safe('distanceValue');
+  const fuelCost = safe('fuelCost');
+  const fuelPrice = safe('fuelPrice');
+  const consumptionUnit = safe('consumptionUnit');
+  const consumptionValue = safe('consumptionValue');
+  const fuelComputedDisplay = safe('fuelComputedDisplay');
+  const insurance = safe('insurance');
+  const maintenance = safe('maintenance');
+  const taxes = safe('taxes');
+  const other = safe('other');
+  const depreciationManual = safe('depreciationManual');
+  const currentMarketPrice = safe('currentMarketPrice');
+  const monthlyPayment = safe('monthlyPayment');
+  const interestRate = safe('interestRate');
+  const totalMonths = safe('totalMonths');
+  const monthsAlreadyPaid = safe('monthsAlreadyPaid');
+  const tripsPerWeek = safe('tripsPerWeek');
+  const commuteDistance = safe('commuteDistance');
+  const commuteTimeNow = safe('commuteTimeNow');
+  const commuteTimeNew = safe('commuteTimeNew');
+  const newCarPrice = safe('newCarPrice');
+  const newCarDistance = safe('newCarDistance');
+  const newCarDownPayment = safe('newCarDownPayment');
+  const newCarRate = safe('newCarRate');
+  const newCarTerm = safe('newCarTerm');
+  const newCarOpGrowth = safe('newCarOpGrowth');
+  const tradeInValue = safe('tradeInValue');
+  const expFood = safe('expFood');
+  const expHousing = safe('expHousing');
+  const expComms = safe('expComms');
+  const expOther = safe('expOther');
+  const monthlyIncome = safe('monthlyIncome');
+  const currentSavings = safe('currentSavings');
+  const savingsRate = safe('savingsRate');
+
+  const ncPrice = safe('ncPrice');
+  const ncDistance = safe('ncDistance');
+  const ncDownPayment = safe('ncDownPayment');
+  const ncRate = safe('ncRate');
+  const ncTerm = safe('ncTerm');
+  const ncFuel = safe('ncFuel');
+  const ncFuelPrice = safe('ncFuelPrice');
+  const ncConsumptionUnit = safe('ncConsumptionUnit');
+  const ncConsumptionValue = safe('ncConsumptionValue');
+  const ncFuelComputedDisplay = safe('ncFuelComputedDisplay');
+  const ncInsurance = safe('ncInsurance');
+  const ncMaintenance = safe('ncMaintenance');
+  const ncTaxes = safe('ncTaxes');
+  const ncOther = safe('ncOther');
+  const ncTripsPerWeek = safe('ncTripsPerWeek');
+  const ncCommuteDistance = safe('ncCommuteDistance');
+  const ncCommuteTimeNow = safe('ncCommuteTimeNow');
+  const ncCommuteTimeNew = safe('ncCommuteTimeNew');
+  const ncExpFood = safe('ncExpFood');
+  const ncExpHousing = safe('ncExpHousing');
+  const ncExpComms = safe('ncExpComms');
+  const ncExpOther = safe('ncExpOther');
+  const ncMonthlyIncome = safe('ncMonthlyIncome');
+  const ncCurrentSavings = safe('ncCurrentSavings');
+  const ncSavingsRate = safe('ncSavingsRate');
+
+  const btnFuelManual = safe('btnFuelManual');
+  const btnFuelPrice = safe('btnFuelPrice');
+  const fuelManualFields = safe('fuelManualFields');
+  const fuelPriceFields = safe('fuelPriceFields');
+  const ncBtnFuelManual = safe('ncBtnFuelManual');
+  const ncBtnFuelPrice = safe('ncBtnFuelPrice');
+  const ncFuelManualFields = safe('ncFuelManualFields');
+  const ncFuelPriceFields = safe('ncFuelPriceFields');
+  const btnDepManual = safe('btnDepManual');
+  const btnDepAuto = safe('btnDepAuto');
+  const btnCreditOff = safe('btnCreditOff');
+  const btnCreditOn = safe('btnCreditOn');
+  const btnTradeInOn = safe('btnTradeInOn');
+  const btnTradeInOff = safe('btnTradeInOff');
+  const btnPayCredit = safe('btnPayCredit');
+  const btnPayCash = safe('btnPayCash');
+  const ncBtnCredit = safe('ncBtnCredit');
+  const ncBtnCash = safe('ncBtnCash');
+  const btnUseResidual = safe('btnUseResidual');
+  const depManualFields = safe('depManualFields');
+  const depAutoFields = safe('depAutoFields');
+  const creditFields = safe('creditFields');
+  const creditOnlyFields = safe('creditOnlyFields');
+  const tradeInFields = safe('tradeInFields');
+  const ncCreditFields = safe('ncCreditFields');
+  const themeSwitch = safe('themeSwitch');
+  const shareModal = safe('shareModal');
+  const shareCancel = safe('shareCancel');
+  const shareDownload = safe('shareDownload');
+  const shareIncludePersonal = safe('shareIncludePersonal');
+  const shareIncludeSavings = safe('shareIncludeSavings');
+  const happyAtPurchaseRange = safe('happyAtPurchaseRange');
+  const happyNowRange = safe('happyNowRange');
+  const ncDisclaimer = safe('ncDisclaimer');
+  const ncDisclaimerHead = safe('ncDisclaimerHead');
+
+  // ============ THEME ============
+  function applyTheme(t) {
+    if (t !== 'light' && t !== 'dark' && t !== 'cyber') t = 'light';
+    document.documentElement.setAttribute('data-theme', t);
+    if (themeSwitch) {
+      themeSwitch.querySelectorAll('button').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-theme-value') === t);
+      });
+    }
+    try { localStorage.setItem('carAppTheme', t); } catch (e) {}
+    if (state.mode) updateResults();
+  }
+  if (themeSwitch) {
+    themeSwitch.querySelectorAll('button').forEach(btn => {
+      onTap(btn, () => applyTheme(btn.getAttribute('data-theme-value')));
+    });
+  }
+  let savedTheme = 'light';
+  try { savedTheme = localStorage.getItem('carAppTheme') || 'light'; } catch (e) {}
+  applyTheme(savedTheme);
+
+  // ============ HAPPINESS SLIDERS ============
+  function wireHappySlider(inputEl, fillEl, thumbEl, badgeEl) {
+    function update() {
+      const v = intInRange(inputEl, 1, 10, 5);
+      const pct = ((v - 1) / 9) * 100;
+      if (fillEl) fillEl.style.width = pct + '%';
+      if (thumbEl) thumbEl.style.left = pct + '%';
+      if (badgeEl) badgeEl.textContent = v;
+    }
+    if (inputEl) inputEl.addEventListener('input', () => { update(); updateResults(); });
+    update();
+    return { getValue: () => intInRange(inputEl, 1, 10, 5) };
+  }
+  const happyAtPurchaseCtrl = wireHappySlider(happyAtPurchaseRange, safe('happyAtPurchaseFill'), safe('happyAtPurchaseThumb'), safe('happyAtPurchaseVal'));
+  const happyNowCtrl = wireHappySlider(happyNowRange, safe('happyNowFill'), safe('happyNowThumb'), safe('happyNowVal'));
+
+  // ============ HAVE getters ============
+  function getHaveFuelAnnual() {
+    if (state.fuelMode === 'manual') return num(fuelCost);
+    return computeFuelAnnual(num(distanceValue), num(fuelPrice), num(consumptionValue), consumptionUnit ? consumptionUnit.value : 'per100');
+  }
+  function getHaveOperating() {
+    return getHaveFuelAnnual() + num(insurance) + num(maintenance) + num(taxes) + num(other);
+  }
+  function getHaveAutoDepreciation() {
+    if (state.depreciationMode !== 'auto') return 0;
+    const p = num(purchasePrice), py = num(purchaseYear), cp = num(currentMarketPrice);
+    const cy = new Date().getFullYear();
+    if (py <= 0 || py > cy) return 0;
+    return Math.max(0, p - cp) / Math.max(1, cy - py);
+  }
+  function getHaveDepreciation() {
+    return state.depreciationMode === 'manual' ? num(depreciationManual) : getHaveAutoDepreciation();
+  }
+  function getHaveCreditYearly() { return state.creditMode === 'on' ? num(monthlyPayment) * 12 : 0; }
+  function getHaveCreditOverpay() {
+    if (state.creditMode === 'off') return 0;
+    const m = num(monthlyPayment), total = num(totalMonths), paid = num(monthsAlreadyPaid);
+    const remaining = Math.max(0, total - paid);
+    const r = num(interestRate);
+    if (m <= 0 || remaining <= 0 || r <= 0) return 0;
+    const mr = r / 100 / 12;
+    const principal = m * (1 - Math.pow(1 + mr, -remaining)) / mr;
+    return Math.max(0, m * remaining - principal);
+  }
+  function getHaveResidual() {
+    if (state.depreciationMode === 'auto') return num(currentMarketPrice);
+    const p = num(purchasePrice), py = num(purchaseYear), dep = num(depreciationManual);
+    const cy = new Date().getFullYear();
+    if (py <= 0) return p;
+    return Math.max(0, p - dep * Math.max(0, cy - py));
+  }
+  function getHaveCurrentMonthly() {
+    return (getHaveOperating() + getHaveDepreciation() + getHaveCreditYearly()) / 12;
+  }
+  function getHaveTradeIn() { return state.tradeInMode === 'off' ? 0 : num(tradeInValue); }
+  function getHaveNewCarLoan() {
+    const price = num(newCarPrice);
+    const tradeIn = getHaveTradeIn();
+    const effectivePrice = Math.max(0, price - tradeIn);
+    let principal = 0, monthly = 0, overpay = 0, term = 0;
+    if (state.paymentMode === 'credit') {
+      const down = num(newCarDownPayment);
+      principal = Math.max(0, effectivePrice - down);
+      term = num(newCarTerm);
+      const r = computeAnnuity(principal, num(newCarRate), term);
+      monthly = r.monthly; overpay = r.overpay;
+    }
+    return { price, tradeIn, effectivePrice, principal, monthly, overpay, term };
+  }
+  function getHaveNewOperating() {
+    const base = getHaveOperating();
+    const growth = (num(newCarOpGrowth) || 5) / 100;
+    return base * (1 + growth);
+  }
+  function getHaveNewMonthly() {
+    const operating = getHaveNewOperating();
+    const dep = num(newCarPrice) * 0.15;
+    const loan = getHaveNewCarLoan();
+    return (operating + dep) / 12 + (state.paymentMode === 'credit' ? loan.monthly : 0);
+  }
+  function getHavePersonalMonthly() {
+    return num(expFood) + num(expHousing) + num(expComms) + num(expOther);
+  }
+
+  // ============ NONE getters ============
+  function getNcFuelAnnual() {
+    if (state.ncFuelMode === 'manual') return num(ncFuel);
+    return computeFuelAnnual(num(ncDistance), num(ncFuelPrice), num(ncConsumptionValue), ncConsumptionUnit ? ncConsumptionUnit.value : 'per100');
+  }
+  function getNcOperating() {
+    return getNcFuelAnnual() + num(ncInsurance) + num(ncMaintenance) + num(ncTaxes) + num(ncOther);
+  }
+  function getNcLoan() {
+    const price = num(ncPrice);
+    let principal = 0, monthly = 0, overpay = 0, term = 0;
+    if (state.ncPaymentMode === 'credit') {
+      const down = num(ncDownPayment);
+      principal = Math.max(0, price - down);
+      term = num(ncTerm);
+      const r = computeAnnuity(principal, num(ncRate), term);
+      monthly = r.monthly; overpay = r.overpay;
+    }
+    return { price, principal, monthly, overpay, term };
+  }
+  function getNcDepreciation() { return num(ncPrice) * 0.15; }
+  function getNcMonthly() {
+    const operating = getNcOperating();
+    const dep = getNcDepreciation();
+    const loan = getNcLoan();
+    return (operating + dep) / 12 + (state.ncPaymentMode === 'credit' ? loan.monthly : 0);
+  }
+  function getNcPersonalMonthly() {
+    return num(ncExpFood) + num(ncExpHousing) + num(ncExpComms) + num(ncExpOther);
+  }
+
+  // ============ CHART PALETTE ============
+  function getColors() {
+    const theme = document.documentElement.getAttribute('data-theme');
+    if (theme === 'cyber') {
+      return { grid: '#3d1a5c', text: '#9b7fc4', accent: '#ff2a9d', warning: '#00e5ff', savings: '#00ff9d', savingsNew: '#00e5ff', savingsNoCar: '#9b7fc4', positive: '#00ff9d', zeroLine: '#5a3a7a', glow: true };
+    }
+    if (theme === 'dark') {
+      return { grid: '#333941', text: '#707885', accent: '#5b8bf0', warning: '#fbbf24', savings: '#4ade80', savingsNew: '#fbbf24', savingsNoCar: '#707885', positive: '#4ade80', zeroLine: '#4a5260', glow: false };
+    }
+    return { grid: '#e3e7ed', text: '#8a929e', accent: '#2b5fd9', warning: '#b45309', savings: '#14804a', savingsNew: '#b45309', savingsNoCar: '#8a929e', positive: '#14804a', zeroLine: '#c8ced6', glow: false };
+  }
+
+  // ============ CHART DRAWING ============
+  const canvas = safe('costCurveCanvas');
+  const ctx = canvas ? canvas.getContext('2d') : null;
+  const savCanvas = safe('savingsCanvas');
+  const savCtx = savCanvas ? savCanvas.getContext('2d') : null;
+  const hapCanvas = safe('happinessCanvas');
+  const hapCtx = hapCanvas ? hapCanvas.getContext('2d') : null;
+
+  function drawLineOn(c, xPos, yPos, pts, color, dashed, glow) {
+    if (glow) {
+      c.strokeStyle = color; c.lineWidth = 6; c.globalAlpha = 0.25;
+      c.setLineDash(dashed ? [6, 4] : []);
+      c.beginPath();
+      pts.forEach((p, i) => {
+        const x = xPos(p.x), y = yPos(p.y);
+        if (i === 0) c.moveTo(x, y); else c.lineTo(x, y);
+      });
+      c.stroke();
+      c.globalAlpha = 1;
+    }
+    c.strokeStyle = color; c.lineWidth = 2.5;
+    c.setLineDash(dashed ? [6, 4] : []);
+    c.beginPath();
+    pts.forEach((p, i) => {
+      const x = xPos(p.x), y = yPos(p.y);
+      if (i === 0) c.moveTo(x, y); else c.lineTo(x, y);
+    });
+    c.stroke();
+    c.setLineDash([]);
+  }
+
+  function drawCostChart(seriesA, seriesB, todayYear) {
+    if (!ctx || !canvas) return;
+    const W = canvas.width, H = canvas.height;
+    const C = getColors();
+    ctx.clearRect(0, 0, W, H);
+    const all = seriesA.concat(seriesB).filter(p => isFinite(p.perKm) && p.perKm > 0);
+    if (all.length < 2) return;
+    const allYears = all.map(p => p.calendarYear);
+    const minX = Math.min(...allYears), maxX = Math.max(...allYears);
+    const maxY = Math.max(...all.map(p => p.perKm)) * 1.1;
+    const padL = 70, padR = 20, padT = 20, padB = 40;
+    const plotW = W - padL - padR, plotH = H - padT - padB;
+    const xPos = y => padL + ((y - minX) / (maxX - minX)) * plotW;
+    const yPos = v => padT + plotH - (v / maxY) * plotH;
+
+    ctx.strokeStyle = C.grid; ctx.lineWidth = 1;
+    for (let i = 0; i <= 5; i++) {
+      const y = padT + (plotH / 5) * i;
+      ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(W - padR, y); ctx.stroke();
+      ctx.fillStyle = C.text; ctx.font = '11px Inter, sans-serif'; ctx.textAlign = 'right';
+      ctx.fillText(fmt(maxY - (maxY / 5) * i), padL - 8, y + 4);
+    }
+    const step = Math.max(1, Math.ceil((maxX - minX) / 10));
+    ctx.textAlign = 'center';
+    for (let yy = minX; yy <= maxX; yy += step) ctx.fillText(yy, xPos(yy), H - padB + 20);
+
+    if (seriesA.length > 1) drawLineOn(ctx, xPos, yPos, seriesA.map(p => ({ x: p.calendarYear, y: p.perKm })), C.accent, false, C.glow);
+    if (seriesB.length > 1) drawLineOn(ctx, xPos, yPos, seriesB.map(p => ({ x: p.calendarYear, y: p.perKm })), C.warning, true, C.glow);
+
+    if (todayYear >= minX && todayYear <= maxX) {
+      ctx.strokeStyle = C.positive; ctx.lineWidth = 1.5;
+      ctx.setLineDash([3, 3]);
+      ctx.beginPath();
+      ctx.moveTo(xPos(todayYear), padT);
+      ctx.lineTo(xPos(todayYear), H - padB);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = C.positive;
+      ctx.font = 'bold 11px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('сегодня', xPos(todayYear), padT - 4);
+    }
+  }
+
+  function drawSavingsChart(seriesArr, years) {
+    if (!savCtx || !savCanvas) return;
+    const W = savCanvas.width, H = savCanvas.height;
+    const C = getColors();
+    savCtx.clearRect(0, 0, W, H);
+    const all = [].concat(...seriesArr.map(s => s.points || []));
+    if (!all.length) return;
+    const maxY = Math.max(...all.map(p => p.value), 1) * 1.05;
+    const minY = Math.min(...all.map(p => p.value), 0);
+    const rangeY = maxY - minY || 1;
+    const padL = 80, padR = 20, padT = 20, padB = 40;
+    const plotW = W - padL - padR, plotH = H - padT - padB;
+    const xPos = y => padL + (y / years) * plotW;
+    const yPos = v => padT + plotH - ((v - minY) / rangeY) * plotH;
+
+    savCtx.strokeStyle = C.grid; savCtx.lineWidth = 1;
+    for (let i = 0; i <= 5; i++) {
+      const y = padT + (plotH / 5) * i;
+      savCtx.beginPath(); savCtx.moveTo(padL, y); savCtx.lineTo(W - padR, y); savCtx.stroke();
+      savCtx.fillStyle = C.text; savCtx.font = '11px Inter, sans-serif'; savCtx.textAlign = 'right';
+      const val = maxY - (rangeY / 5) * i;
+      savCtx.fillText(fmt(val) + ' ₽', padL - 8, y + 4);
+    }
+    if (minY < 0 && maxY > 0) {
+      const yZero = yPos(0);
+      savCtx.strokeStyle = C.zeroLine; savCtx.lineWidth = 1;
+      savCtx.setLineDash([4, 4]);
+      savCtx.beginPath(); savCtx.moveTo(padL, yZero); savCtx.lineTo(W - padR, yZero); savCtx.stroke();
+      savCtx.setLineDash([]);
+    }
+    savCtx.fillStyle = C.text; savCtx.textAlign = 'center';
+    for (let yy = 0; yy <= years; yy += Math.max(1, Math.ceil(years / 10))) {
+      savCtx.fillText(yy + 'г', xPos(yy), H - padB + 20);
+    }
+    seriesArr.forEach(s => {
+      if (!s.points || s.points.length < 2) return;
+      drawLineOn(savCtx, xPos, yPos, s.points.map(p => ({ x: p.year, y: p.value })), s.color, s.dashed, C.glow);
+    });
+  }
+
+  function drawHappinessChart(seriesArr, minYear, maxYear, currentYear) {
+    if (!hapCtx || !hapCanvas) return;
+    const W = hapCanvas.width, H = hapCanvas.height;
+    const C = getColors();
+    hapCtx.clearRect(0, 0, W, H);
+    const padL = 60, padR = 20, padT = 20, padB = 40;
+    const plotW = W - padL - padR, plotH = H - padT - padB;
+    const xPos = y => padL + ((y - minYear) / (maxYear - minYear)) * plotW;
+    const yPos = v => padT + plotH - (v / 10) * plotH;
+
+    hapCtx.strokeStyle = C.grid; hapCtx.lineWidth = 1;
+    for (let i = 0; i <= 5; i++) {
+      const y = padT + (plotH / 5) * i;
+      hapCtx.beginPath(); hapCtx.moveTo(padL, y); hapCtx.lineTo(W - padR, y); hapCtx.stroke();
+      hapCtx.fillStyle = C.text; hapCtx.font = '11px Inter, sans-serif'; hapCtx.textAlign = 'right';
+      hapCtx.fillText(Math.round(10 - (10 / 5) * i), padL - 8, y + 4);
+    }
+    hapCtx.textAlign = 'center';
+    const step = Math.max(1, Math.ceil((maxYear - minYear) / 8));
+    for (let yy = minYear; yy <= maxYear; yy += step) {
+      hapCtx.fillText(yy, xPos(yy), H - padB + 20);
+    }
+    seriesArr.forEach(s => {
+      if (!s.points || s.points.length < 2) return;
+      drawLineOn(hapCtx, xPos, yPos, s.points.map(p => ({ x: p.year, y: p.value })), s.color, s.dashed, C.glow);
+    });
+    if (currentYear >= minYear && currentYear <= maxYear) {
+      hapCtx.strokeStyle = C.positive; hapCtx.lineWidth = 1.5;
+      hapCtx.setLineDash([3, 3]);
+      hapCtx.beginPath();
+      hapCtx.moveTo(xPos(currentYear), padT);
+      hapCtx.lineTo(xPos(currentYear), H - padB);
+      hapCtx.stroke();
+      hapCtx.setLineDash([]);
+      hapCtx.fillStyle = C.positive;
+      hapCtx.font = 'bold 11px Inter, sans-serif';
+      hapCtx.textAlign = 'center';
+      hapCtx.fillText('сегодня', xPos(currentYear), padT - 4);
+    }
+  }
+
+  // ============ UPDATE — HAVE ============
+  function updateHave() {
+    const currentYear = new Date().getFullYear();
+    const purchaseY = num(purchaseYear) || currentYear;
+
+    if (state.fuelMode === 'price' && fuelComputedDisplay) {
+      const f = computeFuelAnnual(num(distanceValue), num(fuelPrice), num(consumptionValue), consumptionUnit ? consumptionUnit.value : 'per100');
+      fuelComputedDisplay.textContent = fmt(f);
+    }
+
+    const currOperatingAnnual = getHaveOperating();
+    const currDepAnnual = getHaveDepreciation();
+    const currCreditAnnual = getHaveCreditYearly();
+    const currTotalMonthly = (currOperatingAnnual + currDepAnnual + currCreditAnnual) / 12;
+
+    const newOperating = getHaveNewOperating();
+    const newDep = num(newCarPrice) * 0.15;
+    const loan = getHaveNewCarLoan();
+    const newCreditMonthly = state.paymentMode === 'credit' ? loan.monthly : 0;
+    const newTotalMonthly = (newOperating + newDep) / 12 + newCreditMonthly;
+
+    const personalMonthly = getHavePersonalMonthly();
+    const income = num(monthlyIncome);
+
+    const hNow = happyNowCtrl.getValue();
+    const hapPerMoney = currTotalMonthly > 0 ? (hNow / currTotalMonthly) * 1000 : 0;
+
+    setText('resultCurrentMonthly', fmt(currTotalMonthly));
+    setText('resultNewMonthly', fmt(newTotalMonthly));
+    const diff = newTotalMonthly - currTotalMonthly;
+    setText('resultDiff', (diff >= 0 ? '+' : '−') + fmt(Math.abs(diff)));
+    setText('resultHappinessPerMoney', hapPerMoney.toFixed(1));
+
+    const ts = computeTimeSaved(num(tripsPerWeek), num(commuteTimeNow), num(commuteTimeNew));
+    if (ts.hoursPerMonth > 0) {
+      setText('resultTimeSaved', ts.hoursPerMonth.toFixed(1));
+      setText('resultTimeSavedSub', 'ч / месяц · ' + ts.hoursPerYear.toFixed(0) + ' ч/год');
+      const card = safe('resultTimeSavedCard');
+      if (card) card.className = 'result positive';
+    } else {
+      setText('resultTimeSaved', '—');
+      setText('resultTimeSavedSub', 'укажите время поездок');
+      const card = safe('resultTimeSavedCard');
+      if (card) card.className = 'result';
+    }
+
+    setText('cmpCurrentOperating', fmt(currOperatingAnnual / 12) + ' ₽');
+    setText('cmpCurrentDep', fmt(currDepAnnual / 12) + ' ₽');
+    setText('cmpCurrentCredit', fmt(currCreditAnnual / 12) + ' ₽');
+    setText('cmpCurrentTotal', fmt(currTotalMonthly) + ' ₽');
+    setText('cmpNewOperating', fmt(newOperating / 12) + ' ₽');
+    setText('cmpNewDep', fmt(newDep / 12) + ' ₽');
+    setText('cmpNewCredit', fmt(newCreditMonthly) + ' ₽');
+    setText('cmpNewTotal', fmt(newTotalMonthly) + ' ₽');
+    setText('cmpFood', fmt(num(expFood)) + ' ₽');
+    setText('cmpHousing', fmt(num(expHousing)) + ' ₽');
+    setText('cmpComms', fmt(num(expComms) + num(expOther)) + ' ₽');
+    setText('cmpLifeTotal', fmt(personalMonthly) + ' ₽');
+
+    if (income > 0) {
+      setText('cmpCurrentShare', (currTotalMonthly / income * 100).toFixed(1) + '%');
+      setText('cmpNewShare', (newTotalMonthly / income * 100).toFixed(1) + '%');
+      setText('cmpLifeShare', (personalMonthly / income * 100).toFixed(1) + '%');
+    } else {
+      setText('cmpCurrentShare', '—'); setText('cmpNewShare', '—'); setText('cmpLifeShare', '—');
+    }
+    const maxBar = Math.max(currTotalMonthly, newTotalMonthly, personalMonthly, 1);
+    const currBar = safe('cmpCurrentBar'), newBar = safe('cmpNewBar'), lifeBar = safe('cmpLifeBar');
+    if (currBar) currBar.style.width = (currTotalMonthly / maxBar * 100) + '%';
+    if (newBar) newBar.style.width = (newTotalMonthly / maxBar * 100) + '%';
+    if (lifeBar) lifeBar.style.width = (personalMonthly / maxBar * 100) + '%';
+
+    setText('loanAmount', fmt(loan.principal) + ' ₽');
+    setText('loanMonthly', fmt(loan.monthly) + ' ₽');
+    setText('loanOverpay', fmt(loan.overpay) + ' ₽');
+    setText('loanRealPrice', fmt(loan.price + loan.overpay) + ' ₽');
+    setText('creditYearlyDisplay', fmt(getHaveCreditYearly()));
+    setText('creditOverpayDisplay', fmt(getHaveCreditOverpay()));
+    if (state.depreciationMode === 'auto') {
+      const el = safe('autoDepreciationInfo');
+      if (el) el.innerHTML = 'Потери в год: <strong>' + fmt(getHaveAutoDepreciation()) + ' ₽</strong>';
+    }
+    const opBaseEl = safe('newCarOpBaseDisplay');
+    if (opBaseEl) opBaseEl.textContent = fmt(currOperatingAnnual);
+
+    renderLoanComparison(loan);
+
+    const opGrowth = (num(newCarOpGrowth) || 5) / 100;
+    const existingPoints = buildCurve(15, {
+      purchasePrice: num(purchasePrice),
+      annualKm: Math.max(1, num(distanceValue) || 1),
+      operatingBase: currOperatingAnnual,
+      operatingGrowth: opGrowth,
+      creditMonthly: state.creditMode === 'on' ? num(monthlyPayment) : 0,
+      creditStartOffset: 0,
+      totalMonths: state.creditMode === 'on' ? num(totalMonths) : 0,
+      startAge: 0,
+      startCalendarYear: purchaseY,
+      includePurchaseInYear0: true,
+      oneTimeYear0: state.creditMode === 'on' ? num(monthlyPayment) : 0
+    });
+    const newAnnualKm = Math.max(1, num(newCarDistance) || num(distanceValue) || 1);
+    const newDown = state.paymentMode === 'credit' ? num(newCarDownPayment) : 0;
+    const cashYear0 = state.paymentMode === 'cash' ? Math.max(0, num(newCarPrice) - loan.tradeIn) : 0;
+    const newPoints = buildCurve(15, {
+      purchasePrice: num(newCarPrice),
+      annualKm: newAnnualKm,
+      operatingBase: currOperatingAnnual,
+      operatingGrowth: opGrowth,
+      creditMonthly: state.paymentMode === 'credit' ? loan.monthly : 0,
+      creditStartOffset: 0,
+      totalMonths: state.paymentMode === 'credit' ? loan.term : 0,
+      startAge: 0,
+      startCalendarYear: currentYear,
+      includePurchaseInYear0: false,
+      oneTimeYear0: state.paymentMode === 'cash' ? cashYear0 : newDown + loan.monthly
+    });
+    drawCostChart(existingPoints, newPoints, currentYear);
+
+    const hPurchase = happyAtPurchaseCtrl.getValue();
+    const yearsOwned = Math.max(1, currentYear - purchaseY);
+    const slope = (hNow - hPurchase) / yearsOwned;
+    const currentSeries = [{ year: purchaseY, value: hPurchase }, { year: currentYear, value: hNow }];
+    for (let y = 1; y <= 10; y++) {
+      let v = hNow + slope * y;
+      v = Math.max(1, Math.min(10, v));
+      currentSeries.push({ year: currentYear + y, value: v });
+    }
+    drawHappinessChart([{ points: currentSeries, color: getColors().accent, dashed: false }], purchaseY, Math.max(purchaseY + 10, currentYear + 10), currentYear);
+    renderHappinessInsight(currentSeries, slope);
+    renderHaveSavings(currTotalMonthly, loan, newOperating / 12);
+  }
+
+  function renderLoanComparison(loan) {
+    const el = safe('loanComparison');
+    if (!el) return;
+    let msg = '', cls = 'insight';
+    if (state.paymentMode === 'cash') {
+      if (loan.tradeIn >= loan.price) {
+        msg = '🎉 Продажа старой полностью покрывает цену новой. Доплата не нужна.';
+      } else {
+        msg = '💵 Доплата наличными: <strong>' + fmt(loan.effectivePrice) + ' ₽</strong>. Без процентов.';
+        if (loan.tradeIn > 0) msg += ' Продажа старой снизила цену на <strong>' + fmt(loan.tradeIn) + ' ₽</strong>.';
+      }
+    } else if (loan.principal <= 0 && loan.price > 0) {
+      msg = '🎉 Продажа + первый взнос покрывают цену полностью. Кредит не нужен.';
+    } else if (loan.overpay > 0) {
+      const pct = (loan.overpay / loan.price) * 100;
+      msg = 'Переплата по кредиту: <strong>' + fmt(loan.overpay) + ' ₽</strong> (' + pct.toFixed(1) + '% от цены). ';
+      msg += 'Реальная стоимость: <strong>' + fmt(loan.price + loan.overpay) + ' ₽</strong>. ';
+      if (pct > 30) { msg += 'Это почти ещё ' + (pct / 100).toFixed(2) + ' такой же машины.'; cls = 'insight warn'; }
+    } else {
+      msg = 'Заполните параметры.';
+    }
+    el.className = cls;
+    el.innerHTML = msg;
+  }
+
+  function renderHappinessInsight(currentSeries, slope) {
+    const el = safe('happinessInsight');
+    if (!el) return;
+    let msg = '', cls = 'insight';
+    const end = currentSeries[currentSeries.length - 1];
+    if (slope < -0.15) msg += 'Текущая машина теряет радость со временем (наклон ' + slope.toFixed(2) + '/год). ';
+    else if (slope > 0.15) msg += 'Текущая машина наоборот радует всё больше. ';
+    else msg += 'Текущая машина стабильна по радости. ';
+    msg += 'Через 10 лет ожидаемо: <strong>' + end.value.toFixed(1) + '/10</strong>.';
+    if (end.value < 4) { msg += '<br>⚠️ Прогноз говорит, что машина перестанет радовать.'; cls = 'insight warn'; }
+    el.className = cls;
+    el.innerHTML = msg;
+  }
+
+  function renderHaveSavings(currTotalMonthly, loan, newOperatingMonthly) {
+    const years = 10;
+    const startCapital = num(currentSavings);
+    const rate = (num(savingsRate) || 0) / 100;
+    const personalMonthly = getHavePersonalMonthly();
+    const income = num(monthlyIncome);
+    const monthlyNet = Math.max(0, income - personalMonthly);
+
+    const keepPts = simulateSavings(years, currTotalMonthly, monthlyNet, startCapital, rate);
+    const noCarPts = simulateSavings(years, 0, monthlyNet, startCapital, rate);
+    const loanMonths = state.paymentMode === 'credit' ? loan.term : 0;
+    const months = years * 12;
+    const monthlyRate = Math.pow(1 + rate, 1 / 12) - 1;
+    const newStart = state.paymentMode === 'cash' ? startCapital - Math.max(0, loan.effectivePrice) : startCapital - num(newCarDownPayment);
+    let bal = newStart;
+    const newPts = [{ year: 0, value: bal }];
+    for (let m = 1; m <= months; m++) {
+      const outflow = (m <= loanMonths ? loan.monthly : 0) + newOperatingMonthly;
+      bal = bal * (1 + monthlyRate) + monthlyNet - outflow;
+      if (m % 12 === 0) newPts.push({ year: m / 12, value: bal });
+    }
+
+    const C = getColors();
+    drawSavingsChart([
+      { points: keepPts, color: C.savings, dashed: false },
+      { points: newPts, color: C.savingsNew, dashed: false },
+      { points: noCarPts, color: C.savingsNoCar, dashed: true }
+    ], years);
+
+    const savKeep = keepPts[keepPts.length - 1].value;
+    const savNew = newPts[newPts.length - 1].value;
+    const savNoCar = noCarPts[noCarPts.length - 1].value;
+    setText('savKeepVal', fmt(savKeep) + ' ₽');
+    setText('savNewVal', fmt(savNew) + ' ₽');
+    setText('savNoCarVal', fmt(savNoCar) + ' ₽');
+
+    const el = safe('savingsInsight');
+    if (!el) return;
+    let msg = '', cls = 'insight';
+    const diffKeep = savNoCar - savKeep;
+    const diffKeepVsNew = savKeep - savNew;
+    msg += 'Через 10 лет: с текущей — <strong>' + fmt(savKeep) + ' ₽</strong>, с новой — <strong>' + fmt(savNew) + ' ₽</strong>, без машины — <strong>' + fmt(savNoCar) + ' ₽</strong>. ';
+    if (diffKeepVsNew > 0) msg += 'Оставить текущую выгоднее новой на <strong>' + fmt(diffKeepVsNew) + ' ₽</strong>. ';
+    else if (diffKeepVsNew < 0) { msg += 'Новая почему-то дешевле на <strong>' + fmt(Math.abs(diffKeepVsNew)) + ' ₽</strong> — проверьте. '; cls = 'insight warn'; }
+    if (diffKeep > 0) msg += 'Текущая машина съедает <strong>' + fmt(diffKeep) + ' ₽</strong> накоплений. ';
+    if (savNew < 0) { msg += '<br>💸 С новой машиной уйдёте в минус.'; cls = 'insight bad'; }
+    el.className = cls;
+    el.innerHTML = msg;
+  }
+
+  // ============ UPDATE — NONE ============
+  function updateNone() {
+    const currentYear = new Date().getFullYear();
+
+    if (state.ncFuelMode === 'price' && ncFuelComputedDisplay) {
+      const f = computeFuelAnnual(num(ncDistance), num(ncFuelPrice), num(ncConsumptionValue), ncConsumptionUnit ? ncConsumptionUnit.value : 'per100');
+      ncFuelComputedDisplay.textContent = fmt(f);
+    }
+
+    const carMonthly = getNcMonthly();
+    const operating = getNcOperating();
+    const dep = getNcDepreciation();
+    const loan = getNcLoan();
+    const creditMonthly = state.ncPaymentMode === 'credit' ? loan.monthly : 0;
+    const personalMonthly = getNcPersonalMonthly();
+    const income = num(ncMonthlyIncome);
+
+    setText('ncResultMonthly', fmt(carMonthly));
+    if (income > 0) setText('ncResultShare', (carMonthly / income * 100).toFixed(1) + '%');
+    else setText('ncResultShare', '—');
+
+    const ts = computeTimeSaved(num(ncTripsPerWeek), num(ncCommuteTimeNow), num(ncCommuteTimeNew));
+    if (ts.hoursPerMonth > 0) {
+      setText('ncResultTimeSaved', ts.hoursPerMonth.toFixed(1));
+      setText('ncResultTimeSavedSub', 'ч / месяц · ' + ts.hoursPerYear.toFixed(0) + ' ч/год');
+      const card = safe('ncResultTimeSavedCard');
+      if (card) card.className = 'result positive';
+    } else {
+      setText('ncResultTimeSaved', '—');
+      setText('ncResultTimeSavedSub', 'укажите время поездок');
+      const card = safe('ncResultTimeSavedCard');
+      if (card) card.className = 'result';
+    }
+
+    setText('ncCmpOperating', fmt(operating / 12) + ' ₽');
+    setText('ncCmpDep', fmt(dep / 12) + ' ₽');
+    setText('ncCmpCredit', fmt(creditMonthly) + ' ₽');
+    setText('ncCmpTotal', fmt(carMonthly) + ' ₽');
+    setText('ncCmpFood', fmt(num(ncExpFood)) + ' ₽');
+    setText('ncCmpHousing', fmt(num(ncExpHousing)) + ' ₽');
+    setText('ncCmpComms', fmt(num(ncExpComms) + num(ncExpOther)) + ' ₽');
+    setText('ncCmpLifeTotal', fmt(personalMonthly) + ' ₽');
+
+    const maxBar = Math.max(carMonthly, personalMonthly, 1);
+    const carBar = safe('ncCmpCarBar'), lifeBar = safe('ncCmpLifeBar');
+    if (carBar) carBar.style.width = (carMonthly / maxBar * 100) + '%';
+    if (lifeBar) lifeBar.style.width = (personalMonthly / maxBar * 100) + '%';
+
+    const opGrowth = 0.05;
+    const ncPoints = buildCurve(15, {
+      purchasePrice: num(ncPrice),
+      annualKm: Math.max(1, num(ncDistance) || 1),
+      operatingBase: operating,
+      operatingGrowth: opGrowth,
+      creditMonthly: state.ncPaymentMode === 'credit' ? loan.monthly : 0,
+      creditStartOffset: 0,
+      totalMonths: state.ncPaymentMode === 'credit' ? loan.term : 0,
+      startAge: 0,
+      startCalendarYear: currentYear,
+      includePurchaseInYear0: true,
+      oneTimeYear0: state.ncPaymentMode === 'credit' ? loan.monthly : 0
+    });
+    drawCostChart([], ncPoints, currentYear);
+
+    renderNoneSavings(carMonthly, operating / 12, loan);
+  }
+
+  function renderNoneSavings(carMonthly, newOperatingMonthly, loan) {
+    const years = 10;
+    const startCapital = num(ncCurrentSavings);
+    const rate = (num(ncSavingsRate) || 0) / 100;
+    const personalMonthly = getNcPersonalMonthly();
+    const income = num(ncMonthlyIncome);
+    const monthlyNet = Math.max(0, income - personalMonthly);
+
+    const noCarPts = simulateSavings(years, 0, monthlyNet, startCapital, rate);
+    const loanMonths = state.ncPaymentMode === 'credit' ? loan.term : 0;
+    const months = years * 12;
+    const monthlyRate = Math.pow(1 + rate, 1 / 12) - 1;
+    const start = state.ncPaymentMode === 'cash' ? startCapital - num(ncPrice) : startCapital - num(ncDownPayment);
+    let bal = start;
+    const carPts = [{ year: 0, value: bal }];
+    for (let m = 1; m <= months; m++) {
+      const outflow = (m <= loanMonths ? loan.monthly : 0) + newOperatingMonthly;
+      bal = bal * (1 + monthlyRate) + monthlyNet - outflow;
+      if (m % 12 === 0) carPts.push({ year: m / 12, value: bal });
+    }
+
+    const C = getColors();
+    drawSavingsChart([
+      { points: carPts, color: C.savingsNew, dashed: false },
+      { points: noCarPts, color: C.savingsNoCar, dashed: true }
+    ], years);
+
+    const savCar = carPts[carPts.length - 1].value;
+    const savNoCar = noCarPts[noCarPts.length - 1].value;
+    setText('savNewVal', fmt(savCar) + ' ₽');
+    setText('savNoCarVal', fmt(savNoCar) + ' ₽');
+
+    const el = safe('savingsInsight');
+    if (!el) return;
+    let msg = '', cls = 'insight';
+    const diff = savNoCar - savCar;
+    msg += 'Через 10 лет: с машиной — <strong>' + fmt(savCar) + ' ₽</strong>, без машины — <strong>' + fmt(savNoCar) + ' ₽</strong>. ';
+    msg += 'Машина съест <strong>' + fmt(diff) + ' ₽</strong> накоплений за 10 лет. ';
+    if (savCar < 0) { msg += '<br>💸 С машиной уйдёте в минус — накоплений не хватит.'; cls = 'insight bad'; }
+    else if (diff > savNoCar * 0.5) { msg += '<br>⚠️ Это больше половины того, что вы бы накопили без машины.'; cls = 'insight warn'; }
+    el.className = cls;
+    el.innerHTML = msg;
+  }
+
+  function updateResults() {
+    if (!state.mode) return;
+    if (state.mode === 'have') updateHave();
+    else updateNone();
+  }
+
+  // ============ MODE PICKER ============
+  function showPicker() {
+    state.mode = null;
+    modePicker.classList.remove('hidden');
+    appBody.classList.add('hidden');
+    shareBtn.classList.add('hidden');
+    headerSub.textContent = 'Выберите сценарий, чтобы начать';
+  }
+  function setMode(newMode) {
+    state.mode = newMode;
+    modePicker.classList.add('hidden');
+    appBody.classList.remove('hidden');
+    shareBtn.classList.remove('hidden');
+    if (newMode === 'have') {
+      modeHave.classList.remove('hidden');
+      modeNone.classList.add('hidden');
+      headerSub.textContent = 'Сценарий: у меня уже есть машина';
+      safe('happinessChartWrap').classList.remove('hidden');
+      safe('savCardKeep').classList.remove('hidden');
+      safe('savingsCards').classList.remove('two');
+      safe('legendExisting').textContent = 'Текущая машина (₽/км)';
+      safe('legendSavKeep').textContent = 'Оставить текущую';
+      safe('legendSavNew').textContent = 'Купить новую';
+      safe('legendSavNoCar').textContent = 'Без машины вообще';
+    } else {
+      modeNone.classList.remove('hidden');
+      modeHave.classList.add('hidden');
+      headerSub.textContent = 'Сценарий: у меня нет машины';
+      safe('happinessChartWrap').classList.add('hidden');
+      safe('savCardKeep').classList.add('hidden');
+      safe('savingsCards').classList.add('two');
+      safe('legendExisting').textContent = 'Без машины (0 ₽/км)';
+      safe('legendSavKeep').textContent = 'Оставить как есть';
+      safe('legendSavNew').textContent = 'Купить машину';
+      safe('legendSavNoCar').textContent = 'Без машины';
+    }
+    updateResults();
+  }
+  document.querySelectorAll('.mode-card').forEach(card => {
+    onTap(card, () => setMode(card.getAttribute('data-mode')));
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setMode(card.getAttribute('data-mode')); }
+    });
+  });
+  onTap(backLink, showPicker);
+  onTap(ncDisclaimerHead, () => ncDisclaimer.classList.toggle('open'));
+
+  // ============ TOGGLE BINDINGS ============
+  function bindToggle(onBtn, offBtn, onFn, offFn) {
+    if (onBtn) onTap(onBtn, () => { onBtn.classList.add('active'); if (offBtn) offBtn.classList.remove('active'); onFn(); updateResults(); });
+    if (offBtn) onTap(offBtn, () => { offBtn.classList.add('active'); if (onBtn) onBtn.classList.remove('active'); offFn(); updateResults(); });
+  }
+  bindToggle(btnFuelManual, btnFuelPrice,
+    () => { state.fuelMode = 'manual'; fuelManualFields.classList.remove('hidden'); fuelPriceFields.classList.add('hidden'); },
+    () => { state.fuelMode = 'price'; fuelPriceFields.classList.remove('hidden'); fuelManualFields.classList.add('hidden'); });
+  bindToggle(ncBtnFuelManual, ncBtnFuelPrice,
+    () => { state.ncFuelMode = 'manual'; ncFuelManualFields.classList.remove('hidden'); ncFuelPriceFields.classList.add('hidden'); },
+    () => { state.ncFuelMode = 'price'; ncFuelPriceFields.classList.remove('hidden'); ncFuelManualFields.classList.add('hidden'); });
+  bindToggle(btnDepManual, btnDepAuto,
+    () => { state.depreciationMode = 'manual'; depManualFields.classList.remove('hidden'); depAutoFields.classList.add('hidden'); },
+    () => { state.depreciationMode = 'auto'; depAutoFields.classList.remove('hidden'); depManualFields.classList.add('hidden'); });
+  bindToggle(btnCreditOff, btnCreditOn,
+    () => { state.creditMode = 'off'; creditFields.classList.add('hidden'); },
+    () => { state.creditMode = 'on'; creditFields.classList.remove('hidden'); });
+  bindToggle(btnTradeInOn, btnTradeInOff,
+    () => { state.tradeInMode = 'on'; tradeInFields.classList.remove('hidden'); },
+    () => { state.tradeInMode = 'off'; tradeInFields.classList.add('hidden'); });
+  bindToggle(btnPayCredit, btnPayCash,
+    () => { state.paymentMode = 'credit'; creditOnlyFields.classList.remove('hidden'); },
+    () => { state.paymentMode = 'cash'; creditOnlyFields.classList.add('hidden'); });
+  bindToggle(ncBtnCredit, ncBtnCash,
+    () => { state.ncPaymentMode = 'credit'; ncCreditFields.classList.remove('hidden'); },
+    () => { state.ncPaymentMode = 'cash'; ncCreditFields.classList.add('hidden'); });
+  onTap(btnUseResidual, () => {
+    const r = getHaveResidual();
+    if (tradeInValue) tradeInValue.value = Math.round(r);
+    updateResults();
+  });
+
+  // ============ INPUT LISTENERS ============
+  const haveInputs = [
+    purchasePrice, purchaseYear, distanceValue, fuelCost, fuelPrice, consumptionValue,
+    insurance, maintenance, taxes, other,
+    depreciationManual, currentMarketPrice, monthlyPayment, interestRate, totalMonths, monthsAlreadyPaid,
+    tripsPerWeek, commuteDistance, commuteTimeNow, commuteTimeNew,
+    newCarPrice, newCarDistance, newCarDownPayment, newCarRate, newCarTerm, newCarOpGrowth, tradeInValue,
+    expFood, expHousing, expComms, expOther, monthlyIncome, currentSavings, savingsRate
+  ].filter(Boolean);
+  const noneInputs = [
+    ncPrice, ncDistance, ncDownPayment, ncRate, ncTerm,
+    ncFuel, ncFuelPrice, ncConsumptionValue,
+    ncInsurance, ncMaintenance, ncTaxes, ncOther,
+    ncTripsPerWeek, ncCommuteDistance, ncCommuteTimeNow, ncCommuteTimeNew,
+    ncExpFood, ncExpHousing, ncExpComms, ncExpOther, ncMonthlyIncome, ncCurrentSavings, ncSavingsRate
+  ].filter(Boolean);
+  haveInputs.concat(noneInputs).forEach(i => i.addEventListener('input', updateResults));
+  haveInputs.concat(noneInputs).forEach(i => i.addEventListener('blur', function () {
+    const v = parseFloat(this.value);
+    if (isFinite(v) && v < 0) this.value = 0;
+    updateResults();
+  }));
+  if (consumptionUnit) consumptionUnit.addEventListener('change', updateResults);
+  if (ncConsumptionUnit) ncConsumptionUnit.addEventListener('change', updateResults);
+
+  // ============ SHARE ============
+  onTap(shareBtn, () => shareModal.classList.add('visible'));
+  onTap(shareCancel, () => shareModal.classList.remove('visible'));
+  if (shareModal) shareModal.addEventListener('click', (e) => { if (e.target === shareModal) shareModal.classList.remove('visible'); });
+  onTap(shareDownload, () => {
+    const includePersonal = shareIncludePersonal ? shareIncludePersonal.checked : true;
+    const includeSavings = shareIncludeSavings ? shareIncludeSavings.checked : true;
+    const html = buildSharedHTML(includePersonal, includeSavings);
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'squirtcar-raschet.html';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    shareModal.classList.remove('visible');
+  });
+
+  function buildSharedHTML(includePersonal, includeSavings) {
+    const css = `
+      body { font-family: -apple-system, system-ui, 'Segoe UI', Roboto, sans-serif; background:#f5f6f8; color:#1a1d23; margin:0; padding:2rem 1rem; line-height:1.5; }
+      .wrap { max-width: 900px; margin:0 auto; }
+      h1 { font-size:1.5rem; font-weight:800; margin:0 0 0.3rem; }
+      .sub { color:#5c6470; font-size:0.9rem; margin-bottom:1.5rem; }
+      .card { background:#fff; border:1px solid #d9dde3; border-radius:12px; padding:1.25rem; margin-bottom:1rem; box-shadow:0 1px 3px rgba(0,0,0,0.06); }
+      .card h2 { font-size:1rem; font-weight:700; margin:0 0 0.8rem; }
+      .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+      @media (max-width:640px) { .grid2 { grid-template-columns:1fr; } }
+      .line { display:flex; justify-content:space-between; padding:0.35rem 0; border-bottom:1px solid #f0f2f5; font-size:0.9rem; }
+      .line:last-child { border-bottom:none; }
+      .line strong { font-weight:700; }
+      .total { border-top:2px solid #d9dde3; margin-top:0.4rem; padding-top:0.4rem; font-weight:700; }
+      .total strong { color:#2b5fd9; }
+      .badge { display:inline-block; background:#e8eefb; color:#2b5fd9; font-weight:700; padding:0.15rem 0.6rem; border-radius:6px; margin-right:0.3rem; font-size:0.85rem; }
+      .row2 { display:grid; grid-template-columns:1fr 1fr; gap:0.7rem; }
+      @media (max-width:500px) { .row2 { grid-template-columns:1fr; } }
+      .metric { background:#f0f2f5; border-radius:8px; padding:0.8rem; text-align:center; }
+      .metric .lbl { font-size:0.72rem; color:#5c6470; font-weight:600; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:0.3rem; }
+      .metric .val { font-size:1.2rem; font-weight:800; color:#1a1d23; }
+      .footer { text-align:center; color:#8a929e; font-size:0.78rem; margin-top:1.5rem; }
+    `;
+    let body = '';
+    if (state.mode === 'have') {
+      const currTotalMonthly = getHaveCurrentMonthly();
+      const newTotalMonthly = getHaveNewMonthly();
+      const loan = getHaveNewCarLoan();
+      const personalMonthly = getHavePersonalMonthly();
+      const income = num(monthlyIncome);
+      const hNow = happyNowCtrl.getValue();
+      const hPurchase = happyAtPurchaseCtrl.getValue();
+      const hapPerMoney = currTotalMonthly > 0 ? (hNow / currTotalMonthly) * 1000 : 0;
+      const ts = computeTimeSaved(num(tripsPerWeek), num(commuteTimeNow), num(commuteTimeNew));
+      const startCapital = num(currentSavings);
+      const rate = (num(savingsRate) || 0) / 100;
+      const monthlyNet = Math.max(0, income - personalMonthly);
+      const keepPts = simulateSavings(10, currTotalMonthly, monthlyNet, startCapital, rate);
+      const noCarPts = simulateSavings(10, 0, monthlyNet, startCapital, rate);
+      const loanMonths = state.paymentMode === 'credit' ? loan.term : 0;
+      const newOperatingMonthly = getHaveNewOperating() / 12;
+      const newStart = state.paymentMode === 'cash' ? startCapital - Math.max(0, loan.effectivePrice) : startCapital - num(newCarDownPayment);
+      let bal = newStart;
+      const mr = Math.pow(1 + rate, 1 / 12) - 1;
+      for (let m = 1; m <= 120; m++) {
+        const outflow = (m <= loanMonths ? loan.monthly : 0) + newOperatingMonthly;
+        bal = bal * (1 + mr) + monthlyNet - outflow;
+      }
+      const savKeep = keepPts[keepPts.length - 1].value;
+      const savNew = bal;
+      const savNoCar = noCarPts[noCarPts.length - 1].value;
+      body = `
+        <div class="grid2">
+          <div class="card">
+            <h2>🚗 Текущая: ${escapeHtml(carModel ? carModel.value : '')}</h2>
+            <div class="line"><span>Цена покупки</span><strong>${fmt(num(purchasePrice))} ₽</strong></div>
+            <div class="line"><span>Год покупки</span><strong>${num(purchaseYear) || '—'}</strong></div>
+            <div class="line"><span>Пробег за год</span><strong>${fmt(num(distanceValue))} км</strong></div>
+            <div class="line total"><span>Стоимость в месяц</span><strong>${fmt(currTotalMonthly)} ₽</strong></div>
+            <div style="margin-top:0.8rem;">
+              <div class="badge">Счастье сейчас: ${hNow}/10</div>
+              <div class="badge">При покупке: ${hPurchase}/10</div>
+            </div>
+          </div>
+          <div class="card">
+            <h2>🆕 Новая: ${escapeHtml(newCarModel ? newCarModel.value : '')}</h2>
+            <div class="line"><span>Цена</span><strong>${fmt(num(newCarPrice))} ₽</strong></div>
+            <div class="line"><span>Платёж по кредиту</span><strong>${fmt(loan.monthly)} ₽/мес</strong></div>
+            <div class="line"><span>Переплата</span><strong>${fmt(loan.overpay)} ₽</strong></div>
+            <div class="line total"><span>Стоимость в месяц</span><strong>${fmt(newTotalMonthly)} ₽</strong></div>
+          </div>
+        </div>
+        <div class="card">
+          <h2>📊 Сравнение в месяц</h2>
+          <div class="row2">
+            <div class="metric"><div class="lbl">Текущая</div><div class="val">${fmt(currTotalMonthly)} ₽</div></div>
+            <div class="metric"><div class="lbl">Новая</div><div class="val">${fmt(newTotalMonthly)} ₽</div></div>
+          </div>
+          <div class="line total" style="margin-top:0.8rem;"><span>Разница</span><strong>${fmt(newTotalMonthly - currTotalMonthly)} ₽/мес</strong></div>
+          <div class="line"><span>Счастье за деньги</span><strong>${hapPerMoney.toFixed(1)} очков / 1000 ₽</strong></div>
+          ${ts.hoursPerMonth > 0 ? `<div class="line"><span>Экономия времени</span><strong>${ts.hoursPerMonth.toFixed(1)} ч/мес (${ts.hoursPerYear.toFixed(0)} ч/год)</strong></div>` : ''}
+        </div>
+        ${includePersonal ? `
+          <div class="card">
+            <h2>🏠 Личные расходы</h2>
+            <div class="line"><span>Еда</span><strong>${fmt(num(expFood))} ₽/мес</strong></div>
+            <div class="line"><span>Жильё</span><strong>${fmt(num(expHousing))} ₽/мес</strong></div>
+            <div class="line"><span>Связь</span><strong>${fmt(num(expComms))} ₽/мес</strong></div>
+            <div class="line"><span>Прочее</span><strong>${fmt(num(expOther))} ₽/мес</strong></div>
+            <div class="line total"><span>Доход</span><strong>${fmt(income)} ₽/мес</strong></div>
+          </div>
+        ` : ''}
+        ${includeSavings ? `
+          <div class="card">
+            <h2>🏦 Накопления</h2>
+            <div class="line"><span>Текущий баланс</span><strong>${fmt(startCapital)} ₽</strong></div>
+            <div class="line"><span>Ставка</span><strong>${num(savingsRate)}% годовых</strong></div>
+          </div>
+        ` : ''}
+        <div class="card">
+          <h2>💰 Итог через 10 лет</h2>
+          <div class="row2">
+            <div class="metric"><div class="lbl">Оставить текущую</div><div class="val">${fmt(savKeep)} ₽</div></div>
+            <div class="metric"><div class="lbl">Купить новую</div><div class="val">${fmt(savNew)} ₽</div></div>
+          </div>
+          ${includePersonal ? `<div class="metric" style="margin-top:0.7rem;"><div class="lbl">Без машины вообще</div><div class="val">${fmt(savNoCar)} ₽</div></div>` : ''}
+        </div>
+      `;
+    } else {
+      const carMonthly = getNcMonthly();
+      const loan = getNcLoan();
+      const personalMonthly = getNcPersonalMonthly();
+      const income = num(ncMonthlyIncome);
+      const ts = computeTimeSaved(num(ncTripsPerWeek), num(ncCommuteTimeNow), num(ncCommuteTimeNew));
+      const startCapital = num(ncCurrentSavings);
+      const rate = (num(ncSavingsRate) || 0) / 100;
+      const monthlyNet = Math.max(0, income - personalMonthly);
+      const noCarPts = simulateSavings(10, 0, monthlyNet, startCapital, rate);
+      const loanMonths = state.ncPaymentMode === 'credit' ? loan.term : 0;
+      const newOperatingMonthly = getNcOperating() / 12;
+      const start = state.ncPaymentMode === 'cash' ? startCapital - num(ncPrice) : startCapital - num(ncDownPayment);
+      let bal = start;
+      const mr = Math.pow(1 + rate, 1 / 12) - 1;
+      for (let m = 1; m <= 120; m++) {
+        const outflow = (m <= loanMonths ? loan.monthly : 0) + newOperatingMonthly;
+        bal = bal * (1 + mr) + monthlyNet - outflow;
+      }
+      const savCar = bal;
+      const savNoCar = noCarPts[noCarPts.length - 1].value;
+      body = `
+        <div class="card">
+          <h2>🚗 Машина: ${escapeHtml(ncCarModel ? ncCarModel.value : '')}</h2>
+          <div class="line"><span>Цена</span><strong>${fmt(num(ncPrice))} ₽</strong></div>
+          <div class="line"><span>Платёж по кредиту</span><strong>${fmt(loan.monthly)} ₽/мес</strong></div>
+          <div class="line"><span>Переплата</span><strong>${fmt(loan.overpay)} ₽</strong></div>
+          <div class="line total"><span>Стоимость в месяц</span><strong>${fmt(carMonthly)} ₽</strong></div>
+        </div>
+        <div class="card">
+          <h2>📊 Сравнение с жизнью</h2>
+          <div class="row2">
+            <div class="metric"><div class="lbl">Машина</div><div class="val">${fmt(carMonthly)} ₽</div></div>
+            <div class="metric"><div class="lbl">Доля дохода</div><div class="val">${income > 0 ? (carMonthly / income * 100).toFixed(1) + '%' : '—'}</div></div>
+          </div>
+          ${ts.hoursPerMonth > 0 ? `<div class="line"><span>Экономия времени</span><strong>${ts.hoursPerMonth.toFixed(1)} ч/мес (${ts.hoursPerYear.toFixed(0)} ч/год)</strong></div>` : ''}
+        </div>
+        ${includePersonal ? `
+          <div class="card">
+            <h2>🏠 Личные расходы</h2>
+            <div class="line"><span>Еда</span><strong>${fmt(num(ncExpFood))} ₽/мес</strong></div>
+            <div class="line"><span>Жильё</span><strong>${fmt(num(ncExpHousing))} ₽/мес</strong></div>
+            <div class="line"><span>Связь</span><strong>${fmt(num(ncExpComms))} ₽/мес</strong></div>
+            <div class="line"><span>Прочее</span><strong>${fmt(num(ncExpOther))} ₽/мес</strong></div>
+            <div class="line total"><span>Доход</span><strong>${fmt(income)} ₽/мес</strong></div>
+          </div>
+        ` : ''}
+        ${includeSavings ? `
+          <div class="card">
+            <h2>🏦 Накопления</h2>
+            <div class="line"><span>Текущий баланс</span><strong>${fmt(startCapital)} ₽</strong></div>
+            <div class="line"><span>Ставка</span><strong>${num(ncSavingsRate)}% годовых</strong></div>
+          </div>
+        ` : ''}
+        <div class="card">
+          <h2>💰 Итог через 10 лет</h2>
+          <div class="row2">
+            <div class="metric"><div class="lbl">Купить машину</div><div class="val">${fmt(savCar)} ₽</div></div>
+            <div class="metric"><div class="lbl">Без машины</div><div class="val">${fmt(savNoCar)} ₽</div></div>
+          </div>
+          <div class="line total" style="margin-top:0.8rem;"><span>Машина съест</span><strong>${fmt(savNoCar - savCar)} ₽</strong></div>
+        </div>
+      `;
+    }
+    const title = state.mode === 'have' ? 'Расчёт: есть машина' : 'Расчёт: нет машины';
+    return `<!DOCTYPE html>
+<html lang="ru"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SquirtCar — ${title}</title><style>${css}</style></head><body>
+<div class="wrap">
+  <h1><span style="color:#2b5fd9;">SquirtCar</span> — ${title}</h1>
+  <div class="sub">Расчёт от ${new Date().toLocaleDateString('ru-RU')}</div>
+  ${body}
+  <div class="footer">
+    SquirtCar · расчёты — оценочные. «Счастье за деньги» — субъективная метрика.
+    ${includePersonal ? '' : 'Личные расходы не включены.'}
+    ${includeSavings ? '' : 'Накопления не включены.'}
+  </div>
+</div>
+</body></html>`;
+  }
+
+  updateResults();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+.venv/
+__pycache__/
+*.pyc
+*.pickle
+.env
+_case.js
+.DS_Store
